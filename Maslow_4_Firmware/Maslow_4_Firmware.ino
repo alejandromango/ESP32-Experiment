@@ -7,6 +7,7 @@
 #include "ESP32MotorControl.h" 	// https://github.com/JoaoLopesF/ESP32MotorControl
 #include "MiniPID.h" //https://github.com/tekdemo/MiniPID
 #include "TLC59711.h"
+#include "DRV8873LED.h"
 #include "comands.h"
 
 const char* ssid = "Leek Soup";
@@ -31,6 +32,11 @@ MiniPID pid = MiniPID(1000,.1,0);
 #define tlcData   5
 #define tlcClock  21
 TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
+DRV8873LED motor1 = DRV8873LED(&tlc, 3, 2);
+DRV8873LED motor2 = DRV8873LED(&tlc, 1, 0);
+DRV8873LED motor3 = DRV8873LED(&tlc, 4, 5);
+DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6);
+DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8);
 
 void setup(){
   Serial.begin(115200);
@@ -102,16 +108,25 @@ void loop(){
     // //Print it out
     // //Serial.println(int(pid.getOutput(RotationAngle/360.0,setPoint)));
     delay(100);
-
-    for(int i = 0; i<12; i++){
-      tlc.setPWM(i, 65535-i);
-    }
-    tlc.write();
+    motor1.stop();
+    motor2.stop();
+    motor3.stop();
+    motor4.stop();
+    motor5.stop();
+    // for(int i = 0; i<12; i++){
+    //   tlc.setPWM(i, 65535-i);
+    // }
+    // tlc.write();
     delay(100);
-    for(int i = 0; i<12; i++){
-      tlc.setPWM(i, 0+i);
-    }
-    tlc.write();
+    motor1.highZ();
+    motor2.highZ();
+    motor3.highZ();
+    motor4.highZ();
+    motor5.highZ();
+    // for(int i = 0; i<12; i++){
+    //   tlc.setPWM(i, 0+i);
+    // }
+    // tlc.write();
 
 
 }
