@@ -104,23 +104,6 @@ void TLC59711::setPWM(uint8_t chan, uint16_t pwm){
 }
 
 /*!
- *  @brief  Set RGB value for selected LED
- *  @param  lednum
- *          selected LED number that for which value will be set
- *  @param  r
- *          red value
- *  @param g
- *          green value
- *  @param b
- *          blue value
- */
-void TLC59711::setLED(uint8_t lednum, uint16_t r, uint16_t g, uint16_t b){
-    setPWM(lednum * 3, r);
-    setPWM(lednum * 3 + 1, g);
-    setPWM(lednum * 3 + 2, b);
-}
-
-/*!
  *  @brief  Begins connection if there is not empty PWM buffer
  *  @return If successful returns true, otherwise false
  */
