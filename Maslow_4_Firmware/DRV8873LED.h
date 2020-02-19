@@ -19,6 +19,11 @@ class DRV8873LED{
 public:
     DRV8873LED(TLC59711 *tlc, uint8_t forwardPin, uint8_t backwardPin);
 
+
+    void forward(uint16_t speed);
+    void fullForward();
+    void backward(uint16_t speed);
+    void fullBackward();
     void runAtSpeed(uint8_t direction, uint16_t speed);
     void stop();
     void highZ();

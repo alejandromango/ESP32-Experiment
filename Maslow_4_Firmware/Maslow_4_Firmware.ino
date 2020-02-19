@@ -107,7 +107,7 @@ void loop(){
 
     // //Print it out
     // //Serial.println(int(pid.getOutput(RotationAngle/360.0,setPoint)));
-    delay(100);
+    delay(1000);
     motor1.stop();
     motor2.stop();
     motor3.stop();
@@ -117,7 +117,7 @@ void loop(){
     //   tlc.setPWM(i, 65535-i);
     // }
     // tlc.write();
-    delay(100);
+    delay(50);
     motor1.highZ();
     motor2.highZ();
     motor3.highZ();
