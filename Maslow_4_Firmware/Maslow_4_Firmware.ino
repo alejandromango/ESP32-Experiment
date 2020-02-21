@@ -27,16 +27,17 @@ const int MotorIn2 = 14;
 
 MiniPID pid = MiniPID(1000,.1,0);
 
+unsigned long ourTime;
 
 #define NUM_TLC59711 1
 #define tlcData   5
 #define tlcClock  21
 TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
-DRV8873LED motor1 = DRV8873LED(&tlc, 3, 2);
-DRV8873LED motor2 = DRV8873LED(&tlc, 1, 0);
-DRV8873LED motor3 = DRV8873LED(&tlc, 4, 5);
-DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6);
-DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8);
+DRV8873LED motor1 = DRV8873LED(&tlc, 3, 2, 32, 10000.0);
+DRV8873LED motor2 = DRV8873LED(&tlc, 1, 0, 33, 10000.0);
+DRV8873LED motor3 = DRV8873LED(&tlc, 4, 5, 34, 10000.0);
+DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6, 35, 10000.0);
+DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8, 36, 10000.0);
 
 void setup(){
   Serial.begin(115200);
@@ -92,6 +93,7 @@ void setup(){
 
   tlc.begin();
   tlc.write();
+  Serial.println("Setup complete");
 
 }
 
@@ -107,26 +109,28 @@ void loop(){
 
     // //Print it out
     // //Serial.println(int(pid.getOutput(RotationAngle/360.0,setPoint)));
-    delay(1000);
     motor1.stop();
     motor2.stop();
-    motor3.stop();
+    motor3.fullForward();
     motor4.stop();
     motor5.stop();
-    // for(int i = 0; i<12; i++){
-    //   tlc.setPWM(i, 65535-i);
-    // }
-    // tlc.write();
-    delay(50);
+    ourTime = millis();
+    while (millis() - ourTime < 5000) {
+      Serial.print("Forward motor current: ");
+      Serial.println(motor3.readCurrent());
+      delay(1000);
+    }
     motor1.highZ();
     motor2.highZ();
-    motor3.highZ();
+    motor3.fullBackward();
     motor4.highZ();
     motor5.highZ();
-    // for(int i = 0; i<12; i++){
-    //   tlc.setPWM(i, 0+i);
-    // }
-    // tlc.write();
+    ourTime = millis();
+    while (millis() - ourTime < 5000) {
+      Serial.print("Backward motor current: ");
+      Serial.println(motor3.readCurrent());
+      delay(1000);
+    }
 
 
 }

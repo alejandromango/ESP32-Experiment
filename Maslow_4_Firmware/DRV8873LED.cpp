@@ -17,10 +17,12 @@
  *  @param  backwardPin
  *          LED driver output to run motor backward (if other is at 0%)
  */
-DRV8873LED::DRV8873LED(TLC59711 *tlc, uint8_t forwardPin, uint8_t backwardPin){
+DRV8873LED::DRV8873LED(TLC59711 *tlc, uint8_t forwardPin, uint8_t backwardPin, uint8_t readbackPin, double senseResistor){
     _driver = tlc;
     _forward = forwardPin;
     _back = backwardPin;
+    _readback = readbackPin;
+    _rsense = senseResistor;
 
 }
 
@@ -94,4 +96,10 @@ void DRV8873LED::highZ(){
     _driver->setPWM(_back, 0);
     _driver->write();
 
+}
+
+double DRV8873LED::readCurrent(){
+    int adcReadback = analogRead(_readback);
+
+    return ((((adcReadback*3)/4095.0)+0.14)/_rsense)*1100.0;
 }
