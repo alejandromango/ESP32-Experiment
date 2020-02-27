@@ -33,7 +33,7 @@ DRV8873LED::DRV8873LED(TLC59711 *tlc, uint8_t forwardPin, uint8_t backwardPin, u
  */
 void DRV8873LED::forward(uint16_t speed){
     _driver->setPWM(_forward, 65535);
-    _driver->setPWM(_back, 65535-speed);
+    _driver->setPWM(_back, speed);
 
 }
 
@@ -53,7 +53,7 @@ void DRV8873LED::fullForward(){
  */
 void DRV8873LED::backward(uint16_t speed){
     _driver->setPWM(_back, 65535);
-    _driver->setPWM(_forward, 65535-speed);
+    _driver->setPWM(_forward, speed);
 
 }
 
@@ -76,11 +76,11 @@ void DRV8873LED::fullBackward(){
 void DRV8873LED::runAtSpeed(uint8_t direction, uint16_t speed){
     if(direction == 0){
         _driver->setPWM(_back, 65535);
-        _driver->setPWM(_forward, 65535-speed);
+        _driver->setPWM(_forward, speed);
 
     }else{
         _driver->setPWM(_forward, 65535);
-        _driver->setPWM(_back, 65535-speed);
+        _driver->setPWM(_back, speed);
     }
     _driver->write();
 }

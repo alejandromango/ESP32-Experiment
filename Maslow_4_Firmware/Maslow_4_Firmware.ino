@@ -15,7 +15,7 @@ const char* password = "Cranberry Pie";
 
 AsyncWebServer server(80);
 
-AS5048A angleSensor(17);
+AS5048A angleSensor(22);
 
 float RotationAngle = 0.0;
 float AngleCurrent  = 0.0;
@@ -97,40 +97,53 @@ void setup(){
 
 }
 
+int motorSpeedValue = 65535;
+
 void loop(){
 
     //Find the position
-    // AngleCurrent = angleSensor.RotationRawToAngle(angleSensor.getRawRotation());
-    // angleSensor.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
-    // errorDist = setPoint - (RotationAngle/360.0);
+    AngleCurrent = angleSensor.RotationRawToAngle(angleSensor.getRawRotation());
+    angleSensor.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
+    errorDist = setPoint - (RotationAngle/360.0);
 
     // //Set the speed of the motor
     // motorSpeed(int(pid.getOutput(RotationAngle/360.0,setPoint)));
 
     // //Print it out
-    // //Serial.println(int(pid.getOutput(RotationAngle/360.0,setPoint)));
-    motor1.stop();
+    Serial.println(AngleCurrent);
+    // motor1.stop();
     motor2.stop();
     motor3.fullForward();
-    motor4.stop();
-    motor5.stop();
-    ourTime = millis();
-    while (millis() - ourTime < 5000) {
-      Serial.print("Forward motor current: ");
-      Serial.println(motor3.readCurrent());
-      delay(1000);
-    }
-    motor1.highZ();
-    motor2.highZ();
+    delay(4000);
+
+    motor2.stop();
     motor3.fullBackward();
-    motor4.highZ();
-    motor5.highZ();
+    delay(4000);
+    // motor4.stop();
+    // motor5.stop();
     ourTime = millis();
-    while (millis() - ourTime < 5000) {
-      Serial.print("Backward motor current: ");
-      Serial.println(motor3.readCurrent());
-      delay(1000);
+    while (millis() - ourTime < 100000) {motor2.stop();
+      motor2.stop();
+      motor3.forward(motorSpeedValue);
+      Serial.print("Motor speed: ");
+      Serial.println(motorSpeedValue);
+      delay(2000);
+      Serial.print("Forward motor current: ");
+      Serial.printf("%g \n", motor3.readCurrent());
+      delay(4000);
+
+      // motor2.stop();
+      // motor3.fullForward();
+      Serial.print("Forward motor current: ");
+      Serial.printf("%g \n", motor3.readCurrent());
+      delay(4000);
+
+      // motor2.stop();
+      // motor3.fullBackward();
+      motorSpeedValue =  motorSpeedValue - 5000;
     }
+
+    motorSpeedValue = 65535;
 
 
 }
