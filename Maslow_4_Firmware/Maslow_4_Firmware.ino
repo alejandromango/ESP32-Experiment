@@ -10,6 +10,9 @@
 #include "DRV8873LED.h"
 #include "comands.h"
 
+#include "driver/adc.h"
+#include "esp_adc_cal.h"
+
 const char* ssid = "Leek Soup";
 const char* password = "Cranberry Pie";
 
@@ -29,15 +32,23 @@ MiniPID pid = MiniPID(1000,.1,0);
 
 unsigned long ourTime;
 
+esp_adc_cal_characteristics_t *adc_1_characterisitics = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
+esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 1100, adc_1_characterisitics);
+esp_err_t config_err_0 = adc1_config_width(ADC_WIDTH_BIT_12);
+esp_err_t config_err_1 = adc1_config_channel_atten(ADC1_GPIO32_CHANNEL, ADC_ATTEN_DB_2_5);
+esp_err_t config_err_2 = adc1_config_channel_atten(ADC1_GPIO33_CHANNEL, ADC_ATTEN_DB_2_5);
+esp_err_t config_err_3 = adc1_config_channel_atten(ADC1_GPIO34_CHANNEL, ADC_ATTEN_DB_2_5);
+esp_err_t config_err_4 = adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTEN_DB_2_5);
+esp_err_t config_err_5 = adc1_config_channel_atten(ADC1_GPIO36_CHANNEL, ADC_ATTEN_DB_2_5);
 #define NUM_TLC59711 1
 #define tlcData   5
 #define tlcClock  21
 TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
-DRV8873LED motor1 = DRV8873LED(&tlc, 3, 2, 32, 10000.0);
-DRV8873LED motor2 = DRV8873LED(&tlc, 1, 0, 33, 10000.0);
-DRV8873LED motor3 = DRV8873LED(&tlc, 4, 5, 34, 10000.0);
-DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6, 35, 10000.0);
-DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8, 36, 10000.0);
+DRV8873LED motor1 = DRV8873LED(&tlc, 3, 2, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics);
+DRV8873LED motor2 = DRV8873LED(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics);
+DRV8873LED motor3 = DRV8873LED(&tlc, 4, 5, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics);
+DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics);
+DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics);
 
 void setup(){
   Serial.begin(115200);
@@ -113,15 +124,15 @@ void loop(){
     Serial.println(AngleCurrent);
     Serial.println("Motor Forward");
     ourTime = millis();
-    while (millis() - ourTime < 15000) {motor2.stop();
-      motor3.forward(motorSpeedValue);
-      Serial.print("Motor speed: ");
-      Serial.println(motorSpeedValue);
+    motor3.forward(motorSpeedValue);
+    Serial.print("Motor speed: ");
+    Serial.println(motorSpeedValue);
+    while (millis() - ourTime < 15000) {
       delay(2000);
       Serial.print("Forward motor current: ");
       Serial.printf("%g \n", motor3.readCurrent());
       delay(1000);
-      motorSpeedValue =  motorSpeedValue - 5000;
+      // motorSpeedValue =  motorSpeedValue - 5000;
     }
 
     motorSpeedValue = 65535;

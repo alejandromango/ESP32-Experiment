@@ -5,11 +5,7 @@
  ****************************************************/
 
 #include "DRV8873LED.h"
-#include "driver/adc.h"
-#include "esp_adc_cal.h"
 
-esp_adc_cal_characteristics_t *adc_1_characterisitics = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
-esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 1100, adc_1_characterisitics);
 /*!
  *  @brief  Instantiates a new DRV8873LED class for generic two-wire control
  *  @param  tlc
@@ -19,12 +15,18 @@ esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB
  *  @param  backwardPin
  *          LED driver output to run motor backward (if other is at 0%)
  */
-DRV8873LED::DRV8873LED(TLC59711 *tlc, uint8_t forwardPin, uint8_t backwardPin, uint8_t readbackPin, double senseResistor){
+DRV8873LED::DRV8873LED(TLC59711 *tlc,
+                       uint8_t forwardPin,
+                       uint8_t backwardPin,
+                       adc1_channel_t readbackPin,
+                       double senseResistor,
+                       esp_adc_cal_characteristics_t *cal){
     _driver = tlc;
     _forward = forwardPin;
     _back = backwardPin;
     _readback = readbackPin;
     _rsense = senseResistor;
+    _cal_values = cal;
 
 }
 
@@ -93,9 +95,7 @@ void DRV8873LED::highZ(){
 }
 
 double DRV8873LED::readCurrent(){
-    int adcReadback = analogRead(_readback);
-    double uncal_mV = ((((adcReadback*3000)/4095.0)+140));
-    double cal_mV = esp_adc_cal_raw_to_voltage(adcReadback, adc_1_characterisitics);
-    Serial.printf("Uncal value: %g , Cal value: %g \n", uncal_mV, cal_mV);
-    return ((((adcReadback*3)/4095.0)+0.14)/_rsense)*1100.0;
+    int adcReadback = adc1_get_raw(_readback);
+    double cal_mV = esp_adc_cal_raw_to_voltage(adcReadback, _cal_values);
+    return (cal_mV/_rsense)*1100.0;
 }
