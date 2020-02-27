@@ -8,6 +8,8 @@
 #ifndef DRV8873LED_H
 #define DRV8873LED_H
 
+enum direction {BACKWARD, FORWARD};
+
 #include <Arduino.h>
 #include "TLC59711.h"
 

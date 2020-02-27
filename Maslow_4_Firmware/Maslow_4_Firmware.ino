@@ -111,35 +111,16 @@ void loop(){
 
     // //Print it out
     Serial.println(AngleCurrent);
-    // motor1.stop();
-    motor2.stop();
-    motor3.fullForward();
-    delay(4000);
-
-    motor2.stop();
-    motor3.fullBackward();
-    delay(4000);
-    // motor4.stop();
-    // motor5.stop();
+    Serial.println("Motor Forward");
     ourTime = millis();
-    while (millis() - ourTime < 100000) {motor2.stop();
-      motor2.stop();
+    while (millis() - ourTime < 15000) {motor2.stop();
       motor3.forward(motorSpeedValue);
       Serial.print("Motor speed: ");
       Serial.println(motorSpeedValue);
       delay(2000);
       Serial.print("Forward motor current: ");
       Serial.printf("%g \n", motor3.readCurrent());
-      delay(4000);
-
-      // motor2.stop();
-      // motor3.fullForward();
-      Serial.print("Forward motor current: ");
-      Serial.printf("%g \n", motor3.readCurrent());
-      delay(4000);
-
-      // motor2.stop();
-      // motor3.fullBackward();
+      delay(1000);
       motorSpeedValue =  motorSpeedValue - 5000;
     }
 
