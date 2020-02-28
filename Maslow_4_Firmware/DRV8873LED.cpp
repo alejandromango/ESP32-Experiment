@@ -95,7 +95,12 @@ void DRV8873LED::highZ(){
 }
 
 double DRV8873LED::readCurrent(){
-    int adcReadback = adc1_get_raw(_readback);
+    int adcReadback = 0;
+    for(int i= 0; i < multisamples; i++){
+        adcReadback += adc1_get_raw(_readback);
+        delayMicroseconds(10);
+    }
+    adcReadback = adcReadback/multisamples;
     double cal_mV = esp_adc_cal_raw_to_voltage(adcReadback, _cal_values);
     return (cal_mV/_rsense)*1100.0;
 }
