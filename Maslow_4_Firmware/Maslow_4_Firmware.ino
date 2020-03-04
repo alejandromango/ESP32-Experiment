@@ -120,22 +120,35 @@ void loop(){
     // //Set the speed of the motor
     // motorSpeed(int(pid.getOutput(RotationAngle/360.0,setPoint)));
 
-    // //Print it out
-    Serial.println(AngleCurrent);
-    Serial.println("Motor Forward");
-    ourTime = millis();
-    motor3.forward(motorSpeedValue);
-    Serial.print("Motor speed: ");
-    Serial.println(motorSpeedValue);
-    while (millis() - ourTime < 15000) {
-      delay(2000);
-      Serial.print("Forward motor current: ");
-      Serial.printf("%g \n", motor3.readCurrent());
-      delay(1000);
-      // motorSpeedValue =  motorSpeedValue - 5000;
-    }
+    // //Motor test
+    motor3.fullForward();
+    delay(2000);
+    Serial.print("Forward motor current: ");
+    Serial.printf("%g \n", motor3.readCurrent());
+    delay(1000);
+    motor3.fullBackward();
+    delay(2000);
+    Serial.print("Backward motor current: ");
+    Serial.printf("%g \n", motor3.readCurrent());
+    delay(1000);
 
-    motorSpeedValue = 65535;
+
+    // TLC test
+    // Serial.println("HighZ all (5V, 5V)");
+    // motor1.highZ();
+    // motor2.highZ();
+    // motor3.highZ();
+    // motor4.highZ();
+    // motor5.highZ();
+    // delay(5000);
+    // Serial.println("Stopping (0, 0), all");
+    // motor1.stop();
+    // motor2.stop();
+    // motor3.stop();
+    // motor4.stop();
+    // motor5.stop();
+    // delay(5000);
+
 
 
 }

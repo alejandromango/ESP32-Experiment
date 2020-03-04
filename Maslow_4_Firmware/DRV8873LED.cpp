@@ -62,6 +62,14 @@ void DRV8873LED::fullBackward(){
     runAtSpeed(BACKWARD, 65535);
 }
 
+void DRV8873LED::runAtPID(int signed_speed){
+    if(signed_speed < 0){
+        runAtSpeed(BACKWARD, abs(signed_speed));
+    }else{
+        runAtSpeed(FORWARD, abs(signed_speed));
+    }
+}
+
 /*!
  *  @brief  Run the motors in the given direction at the given speed
  *  @param  direction
@@ -80,6 +88,8 @@ void DRV8873LED::runAtSpeed(uint8_t direction, uint16_t speed){
     }
     _driver->write();
 }
+
+
 void DRV8873LED::stop(){
     _driver->setPWM(_forward, 65535);
     _driver->setPWM(_back, 65535);

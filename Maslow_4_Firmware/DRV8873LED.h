@@ -34,6 +34,7 @@ public:
     void backward(uint16_t speed);
     void fullBackward();
     void runAtSpeed(uint8_t direction, uint16_t speed);
+    void runAtPID(int signed_speed);
     void stop();
     void highZ();
     double readCurrent();
