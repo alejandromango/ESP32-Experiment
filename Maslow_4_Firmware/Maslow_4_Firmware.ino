@@ -25,7 +25,7 @@ float AmpsCurrent  = 0.0;
 float AnglePrevious = 0.0;
 float errorDist = 0.0;
 
-MiniPID pid = MiniPID(1000,10,0);
+MiniPID pid = MiniPID(50000,100,0);
 
 unsigned long ourTime = millis();
 
@@ -80,7 +80,7 @@ void setup(){
   });
 
   server.on("/position", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(AmpsCurrent, 5).c_str());
+    request->send_P(200, "text/plain", String(AngleCurrent, 5).c_str());
   });
 
   server.on("/target", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -109,30 +109,33 @@ void loop(){
     //Find the position
     // AngleCurrent = angleSensor.RotationRawToAngle(angleSensor.getRawRotation());
     // angleSensor.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
-    // errorDist = setPoint - (RotationAngle/360.0);  // //Set the speed of the motor
--   // motorSpeed(int(pid.getOutput(RotationAngle/360.0,setPoint)));
+    // errorDist = setPoint - (RotationAngle);
+    // // //Set the speed of the motor
+    // motor3.runAtPID(int(pid.getOutput(RotationAngle,setPoint)));
 
-    AmpsCurrent = motor3.readCurrent();
-    errorDist = setPoint - AmpsCurrent;
+    // AmpsCurrent = motor3.readCurrent();
+    // errorDist = setPoint - AmpsCurrent;
 
-    //Set the speed of the motor
-    motor3.runAtPID(int(pid.getOutput(AmpsCurrent,setPoint)));
-    if(millis() - ourTime > 1000){
-      Serial.print("Forward motor speed: ");
-      Serial.printf("%g \n", int(pid.getOutput(AmpsCurrent,setPoint)));
-      ourTime = millis();
-    }
+    // //Set the speed of the motor
+    // motor3.runAtPID(int(pid.getOutput(AmpsCurrent,setPoint)));
+    // if(millis() - ourTime > 1000){
+    //   Serial.print("Forward motor speed: ");
+    //   Serial.printf("%g \n", int(pid.getOutput(AmpsCurrent,setPoint)));
+    //   Serial.print("Motor angle: ");
+    //   Serial.printf("%g \n", AngleCurrent);
+    //   ourTime = millis();
+    // }
     //Motor test
-    // motor3.forward(50000);
-    // delay(2000);
-    // Serial.print("Forward motor current: ");
-    // Serial.printf("%g \n", motor3.readCurrent());
-    // delay(1000);
-    // motor3.fullBackward();
-    // delay(2000);
-    // Serial.print("Backward motor current: ");
-    // Serial.printf("%g \n", motor3.readCurrent());
-    // delay(1000);
+    motor3.forward(50000);
+    delay(2000);
+    Serial.print("Forward motor current: ");
+    Serial.printf("%g \n", motor3.readCurrent());
+    delay(1000);
+    motor3.fullBackward();
+    delay(2000);
+    Serial.print("Backward motor current: ");
+    Serial.printf("%g \n", motor3.readCurrent());
+    delay(1000);
 
 
     // TLC test
