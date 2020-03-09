@@ -17,8 +17,6 @@ const char* password = "Cranberry Pie";
 
 AsyncWebServer server(80);
 
-AS5048A angleSensor(22);
-
 float RotationAngle = 0.0;
 float AngleCurrent  = 0.0;
 float AmpsCurrent  = 0.0;
@@ -47,6 +45,12 @@ DRV8873LED motor3 = DRV8873LED(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_c
 DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics);
 DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics);
 
+AS5048A angleSensor1(17);
+AS5048A angleSensor2(3);
+AS5048A angleSensor3(22);
+AS5048A angleSensor4(25);
+AS5048A angleSensor5(13);
+
 void setup(){
   Serial.begin(115200);
 
@@ -59,7 +63,11 @@ void setup(){
 
   Serial.println(WiFi.localIP());
 
-  angleSensor.init();
+  angleSensor1.init();
+  angleSensor2.init();
+  angleSensor3.init();
+  angleSensor4.init();
+  angleSensor5.init();
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/html", HTML);
@@ -80,7 +88,7 @@ void setup(){
   });
 
   server.on("/position", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(AngleCurrent, 5).c_str());
+    request->send_P(200, "text/plain", String(RotationAngle/360, 5).c_str());
   });
 
   server.on("/target", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -107,9 +115,9 @@ int motorSpeedValue = 65535;
 void loop(){
 
     //Find the position
-    // AngleCurrent = angleSensor.RotationRawToAngle(angleSensor.getRawRotation());
-    // angleSensor.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
-    // errorDist = setPoint - (RotationAngle);
+    AngleCurrent = angleSensor3.RotationRawToAngle(angleSensor3.getRawRotation());
+    angleSensor3.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
+    errorDist = setPoint - (RotationAngle/360);
     // // //Set the speed of the motor
     // motor3.runAtPID(int(pid.getOutput(RotationAngle,setPoint)));
 
@@ -126,16 +134,16 @@ void loop(){
     //   ourTime = millis();
     // }
     //Motor test
-    motor3.forward(50000);
-    delay(2000);
-    Serial.print("Forward motor current: ");
-    Serial.printf("%g \n", motor3.readCurrent());
-    delay(1000);
-    motor3.fullBackward();
-    delay(2000);
-    Serial.print("Backward motor current: ");
-    Serial.printf("%g \n", motor3.readCurrent());
-    delay(1000);
+    // motor3.forward(50000);
+    // delay(2000);
+    // Serial.print("Forward motor current: ");
+    // Serial.printf("%g \n", motor3.readCurrent());
+    // delay(1000);
+    // motor3.fullBackward();
+    // delay(2000);
+    // Serial.print("Backward motor current: ");
+    // Serial.printf("%g \n", motor3.readCurrent());
+    // delay(1000);
 
 
     // TLC test
