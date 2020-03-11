@@ -177,7 +177,7 @@ const char HTML[] PROGMEM = R"(
             <input type='text' name='setpoint5'/>
             <input type='submit' value='Set'>
         </form>
-        <canvas id="canvas 5" width="200" height="100" style="border:1px solid #000000;">
+        <canvas id="canvas5" width="200" height="100" style="border:1px solid #000000;">
         </canvas>
         <p>
             <i class='fas fa-tint' style='color:'00add6;'></i>
