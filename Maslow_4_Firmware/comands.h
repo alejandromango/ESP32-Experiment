@@ -36,8 +36,6 @@ void parseCommand(String command, String value){
     }
 }
 
-void
-
 // void setupMotor(){
     // const int freq = 1000;
     // const int ledChannel = 0;
