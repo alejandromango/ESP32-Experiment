@@ -9,38 +9,30 @@ const char HTML[] PROGMEM = R"(
         window.alert(jsonFormInfo);
     }
     document.errorPoints = [];
-    setInterval(function ( ) {
+
+    function requestLabelUpdate(labelID) {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          document.getElementById('position').innerHTML = this.responseText;
+          document.getElementById(labelID).innerHTML = this.responseText;
         }
       };
-      xhttp.open('GET', '/position', true);
+      xhttp.open('GET', '/'.concat(labelID), true);
       xhttp.send();
-    }, 500 ) ;
-    setInterval(function ( ) {
+    };
+
+    function requestErrorPlotUpdate(labelID, canvasID) {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          document.getElementById('target').innerHTML = this.responseText;
-        }
-      };
-      xhttp.open('GET', '/target', true);
-      xhttp.send();
-    }, 500 ) ;
-    setInterval(function ( ) {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById('errorDist').innerHTML = this.responseText;
-            
+            document.getElementById(labelID).innerHTML = this.responseText;
+
             document.errorPoints.push(parseFloat(this.responseText));
-            const canvas = document.getElementById("myCanvas");
+            const canvas = document.getElementById(canvasID);
             var ctx = canvas.getContext("2d");
-            
+
             ctx.clearRect(0, 0, 500, 500);
-            
+
             ctx.beginPath();
             ctx.moveTo(0, 50);
             var i = 0;
@@ -49,39 +41,159 @@ const char HTML[] PROGMEM = R"(
                 i++;
             }
             ctx.stroke();
-            
+
             if (document.errorPoints.length > 20){
                 document.errorPoints.shift();
             }
         }
       };
-      xhttp.open('GET', '/errorDist', true);
+      xhttp.open('GET', '/'.concat(labelID), true);
       xhttp.send();
+    };
+
+    setInterval(function ( ) {
+      requestLabelUpdate('position1');
+      requestLabelUpdate('position2');
+      requestLabelUpdate('position3');
+      requestLabelUpdate('position4');
+      requestLabelUpdate('position5');
+    }, 500 ) ;
+
+    setInterval(function ( ) {
+      requestLabelUpdate('target1');
+      requestLabelUpdate('target2');
+      requestLabelUpdate('target3');
+      requestLabelUpdate('target4');
+      requestLabelUpdate('target5');
+    }, 500 ) ;
+
+    setInterval(function ( ) {
+        requestErrorPlotUpdate('errorDist1', 'canvas1');
+        requestErrorPlotUpdate('errorDist2', 'canvas2');
+        requestErrorPlotUpdate('errorDist3', 'canvas3');
+        requestErrorPlotUpdate('errorDist4', 'canvas4');
+        requestErrorPlotUpdate('errorDist5', 'canvas5');
     }, 500 ) ;
     </script>
-    <div style = 'margin: 0; position: absolute; top: 50%; left: 50%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%);'>
-        <form method='post' action='/settarget' > 
-            <label class='label'>Target Position:  </label>
-            <input type='text' name='setpoint'/> 
+    <div style = 'margin: 0; position: absolute; top: 0%; left: 5%; -ms-transform: translate(-0%, -0%); transform: translate(-0%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>Target Motor 1:  </label>
+            <input type='text' name='setpoint1'/>
             <input type='submit' value='Set'>
         </form>
+        <canvas id="canvas1" width="200" height="100" style="border:1px solid #000000;">
+        </canvas>
         <p>
-            <i class='fas fa-tint' style='color:'00add6;'></i> 
+            <i class='fas fa-tint' style='color:'00add6;'></i>
             <span class='dht-labels'>Target:  </span>
-            <span id='target'> </span>
+            <span id='target1'> </span>
         </p>
         <p>
-            <i class='fas fa-tint' style='color:'00add6;'></i> 
+            <i class='fas fa-tint' style='color:'00add6;'></i>
             <span class='dht-labels'>Position:  </span>
-            <span id='position'> </span>
+            <span id='position1'> </span>
         </p>
         <p>
-            <i class='fas fa-tint' style='color:'00add6;'></i> 
+            <i class='fas fa-tint' style='color:'00add6;'></i>
             <span class='dht-labels'>Error Dist:  </span>
-            <span id='errorDist'> </span>
+            <span id='errorDist1'> </span>
         </p>
     </div>
-    <canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
-    </canvas>
+    <div style = 'margin: 0; position: absolute; top: 0%; left: 50%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>Target Motor 2:  </label>
+            <input type='text' name='setpoint2'/>
+            <input type='submit' value='Set'>
+        </form>
+        <canvas id="canvas2" width="200" height="100" style="border:1px solid #000000;">
+        </canvas>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Target:  </span>
+            <span id='target2'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Position:  </span>
+            <span id='position2'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Error Dist:  </span>
+            <span id='errorDist2'> </span>
+        </p>
+    </div>
+    <div style = 'margin: 0; position: absolute; top: 0%; left: 65%; -ms-transform: translate(-0%, -0%); transform: translate(-0%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>Target Motor 3:  </label>
+            <input type='text' name='setpoint3'/>
+            <input type='submit' value='Set'>
+        </form>
+        <canvas id="canvas3" width="200" height="100" style="border:1px solid #000000;">
+        </canvas>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Target:  </span>
+            <span id='target3'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Position:  </span>
+            <span id='position3'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Error Dist:  </span>
+            <span id='errorDist3'> </span>
+        </p>
+    </div>
+    <div style = 'margin: 0; position: absolute; top: 50%; left: 30%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>Target Motor 4:  </label>
+            <input type='text' name='setpoint4'/>
+            <input type='submit' value='Set'>
+        </form>
+        <canvas id="canvas4" width="200" height="100" style="border:1px solid #000000;">
+        </canvas>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Target:  </span>
+            <span id='target4'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Position:  </span>
+            <span id='position4'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Error Dist:  </span>
+            <span id='errorDist4'> </span>
+        </p>
+    </div>
+    <div style = 'margin: 0; position: absolute; top: 50%; left: 70%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>Target Motor 5:  </label>
+            <input type='text' name='setpoint5'/>
+            <input type='submit' value='Set'>
+        </form>
+        <canvas id="canvas 5" width="200" height="100" style="border:1px solid #000000;">
+        </canvas>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Target:  </span>
+            <span id='target5'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Position:  </span>
+            <span id='position5'> </span>
+        </p>
+        <p>
+            <i class='fas fa-tint' style='color:'00add6;'></i>
+            <span class='dht-labels'>Error Dist:  </span>
+            <span id='errorDist5'> </span>
+        </p>
+    </div>
 </body>
 )";

@@ -1,17 +1,42 @@
-float setPoint = 0;
-
+float setPoint1 = 0;
+float setPoint2 = 0;
+float setPoint3 = 0;
+float setPoint4 = 0;
+float setPoint5 = 0;
 // ESP32MotorControl MotorControl = ESP32MotorControl();
 
 void parseCommand(String command, String value){
     Serial.println("Parsing Command:");
     Serial.println(command);
 
-    if(command == "setpoint"){
+    if(command == "setpoint1"){
         Serial.println("Error: ");
-        Serial.println(setPoint - value.toFloat());
-        setPoint = value.toFloat();
+        Serial.println(setPoint1 - value.toFloat());
+        setPoint1 = value.toFloat();
+    }
+    if(command == "setpoint2"){
+        Serial.println("Error: ");
+        Serial.println(setPoint2 - value.toFloat());
+        setPoint2 = value.toFloat();
+    }
+    if(command == "setpoint3"){
+        Serial.println("Error: ");
+        Serial.println(setPoint3 - value.toFloat());
+        setPoint3 = value.toFloat();
+    }
+    if(command == "setpoint4"){
+        Serial.println("Error: ");
+        Serial.println(setPoint4 - value.toFloat());
+        setPoint4 = value.toFloat();
+    }
+    if(command == "setpoint5"){
+        Serial.println("Error: ");
+        Serial.println(setPoint5 - value.toFloat());
+        setPoint5 = value.toFloat();
     }
 }
+
+void
 
 // void setupMotor(){
     // const int freq = 1000;

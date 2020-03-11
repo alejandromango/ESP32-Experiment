@@ -12,16 +12,40 @@
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 
-const char* ssid = "Leek Soup";
-const char* password = "Cranberry Pie";
+const char* ssid = "Interneto";
+const char* password = "gTmO#1959##";
 
 AsyncWebServer server(80);
 
-float RotationAngle = 0.0;
-float AngleCurrent  = 0.0;
-float AmpsCurrent  = 0.0;
-float AnglePrevious = 0.0;
-float errorDist = 0.0;
+float RotationAngle1 = 0.0;
+float AngleCurrent1  = 0.0;
+float AmpsCurrent1  = 0.0;
+float AnglePrevious1 = 0.0;
+float errorDist1 = 0.0;
+
+float RotationAngle2 = 0.0;
+float AngleCurrent2  = 0.0;
+float AmpsCurrent2  = 0.0;
+float AnglePrevious2 = 0.0;
+float errorDist2 = 0.0;
+
+float RotationAngle3 = 0.0;
+float AngleCurrent3  = 0.0;
+float AmpsCurrent3  = 0.0;
+float AnglePrevious3 = 0.0;
+float errorDist3 = 0.0;
+
+float RotationAngle4 = 0.0;
+float AngleCurrent4  = 0.0;
+float AmpsCurrent4  = 0.0;
+float AnglePrevious4 = 0.0;
+float errorDist4 = 0.0;
+
+float RotationAngle5 = 0.0;
+float AngleCurrent5  = 0.0;
+float AmpsCurrent5  = 0.0;
+float AnglePrevious5 = 0.0;
+float errorDist5 = 0.0;
 
 MiniPID pid = MiniPID(50000,100,0);
 
@@ -87,16 +111,52 @@ void setup(){
     request->redirect("/");
   });
 
-  server.on("/position", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle/360, 5).c_str());
+  server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(RotationAngle1/360, 5).c_str());
+  });
+  server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(RotationAngle2/360, 5).c_str());
+  });
+  server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(RotationAngle3/360, 5).c_str());
+  });
+  server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(RotationAngle4/360, 5).c_str());
+  });
+  server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(RotationAngle5/360, 5).c_str());
   });
 
-  server.on("/target", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint, 5).c_str());
+  server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(setPoint1, 5).c_str());
+  });
+  server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(setPoint2, 5).c_str());
+  });
+  server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(setPoint3, 5).c_str());
+  });
+  server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(setPoint4, 5).c_str());
+  });
+  server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(setPoint5, 5).c_str());
   });
 
-  server.on("/errorDist", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist, 5).c_str());
+  server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(errorDist1, 5).c_str());
+  });
+  server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(errorDist2, 5).c_str());
+  });
+  server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(errorDist3, 5).c_str());
+  });
+  server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(errorDist4, 5).c_str());
+  });
+  server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(errorDist5, 5).c_str());
   });
 
 
@@ -115,9 +175,21 @@ int motorSpeedValue = 65535;
 void loop(){
 
     //Find the position
-    AngleCurrent = angleSensor3.RotationRawToAngle(angleSensor3.getRawRotation());
-    angleSensor3.AbsoluteAngleRotation(&RotationAngle, &AngleCurrent, &AnglePrevious);
-    errorDist = setPoint - (RotationAngle/360);
+    AngleCurrent1 = angleSensor1.RotationRawToAngle(angleSensor1.getRawRotation());
+    angleSensor1.AbsoluteAngleRotation(&RotationAngle1, &AngleCurrent1, &AnglePrevious1);
+    errorDist1 = setPoint1 - (RotationAngle1/360);
+    AngleCurrent2 = angleSensor2.RotationRawToAngle(angleSensor2.getRawRotation());
+    angleSensor2.AbsoluteAngleRotation(&RotationAngle2, &AngleCurrent2, &AnglePrevious2);
+    errorDist2 = setPoint2 - (RotationAngle2/360);
+    AngleCurrent3 = angleSensor3.RotationRawToAngle(angleSensor3.getRawRotation());
+    angleSensor3.AbsoluteAngleRotation(&RotationAngle3, &AngleCurrent3, &AnglePrevious3);
+    errorDist3 = setPoint3 - (RotationAngle3/360);
+    AngleCurrent4 = angleSensor4.RotationRawToAngle(angleSensor4.getRawRotation());
+    angleSensor4.AbsoluteAngleRotation(&RotationAngle4, &AngleCurrent4, &AnglePrevious4);
+    errorDist4 = setPoint4 - (RotationAngle4/360);
+    AngleCurrent5 = angleSensor5.RotationRawToAngle(angleSensor5.getRawRotation());
+    angleSensor5.AbsoluteAngleRotation(&RotationAngle5, &AngleCurrent5, &AnglePrevious5);
+    errorDist5 = setPoint5 - (RotationAngle5/360);
     // // //Set the speed of the motor
     // motor3.runAtPID(int(pid.getOutput(RotationAngle,setPoint)));
 
