@@ -47,11 +47,11 @@ float AmpsCurrent5  = 0.0;
 float AnglePrevious5 = 0.0;
 float errorDist5 = 0.0;
 
-MiniPID pid1 = MiniPID(10000,.1,0);
-MiniPID pid2 = MiniPID(10000,.1,0);
-MiniPID pid3 = MiniPID(10000,.1,0);
-MiniPID pid4 = MiniPID(10000,.1,0);
-MiniPID pid5 = MiniPID(10000,.1,0);
+MiniPID pid1 = MiniPID(proportional,integral,derivative);
+MiniPID pid2 = MiniPID(proportional,integral,derivative);
+MiniPID pid3 = MiniPID(proportional,integral,derivative);
+MiniPID pid4 = MiniPID(proportional,integral,derivative);
+MiniPID pid5 = MiniPID(proportional,integral,derivative);
 
 unsigned long ourTime = millis();
 
@@ -163,6 +163,15 @@ void setup(){
     request->send_P(200, "text/plain", String(errorDist5, 5).c_str());
   });
 
+  server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(proportional, 5).c_str());
+  });
+  server.on("/integral", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(integral, 5).c_str());
+  });
+  server.on("/derivative", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(derivative, 5).c_str());
+  });
 
   server.begin();
 
@@ -181,72 +190,37 @@ void setup(){
 int motorSpeedValue = 65535;
 
 void loop(){
-
-    //Find the position
     AngleCurrent1 = angleSensor1.RotationRawToAngle(angleSensor1.getRawRotation());
     angleSensor1.AbsoluteAngleRotation(&RotationAngle1, &AngleCurrent1, &AnglePrevious1);
     errorDist1 = setPoint1 - (RotationAngle1/360);
     motor1.runAtPID(int(pid1.getOutput(RotationAngle1/360,setPoint1)));
+
     AngleCurrent2 = angleSensor2.RotationRawToAngle(angleSensor2.getRawRotation());
     angleSensor2.AbsoluteAngleRotation(&RotationAngle2, &AngleCurrent2, &AnglePrevious2);
     errorDist2 = setPoint2 - (RotationAngle2/360);
     motor2.runAtPID(int(pid2.getOutput(RotationAngle2/360,setPoint2)));
+
     AngleCurrent3 = angleSensor3.RotationRawToAngle(angleSensor3.getRawRotation());
     angleSensor3.AbsoluteAngleRotation(&RotationAngle3, &AngleCurrent3, &AnglePrevious3);
     errorDist3 = setPoint3 - (RotationAngle3/360);
     motor3.runAtPID(int(pid3.getOutput(RotationAngle3/360,setPoint3)));
+
     AngleCurrent4 = angleSensor4.RotationRawToAngle(angleSensor4.getRawRotation());
     angleSensor4.AbsoluteAngleRotation(&RotationAngle4, &AngleCurrent4, &AnglePrevious4);
     errorDist4 = setPoint4 - (RotationAngle4/360);
     motor4.runAtPID(int(pid4.getOutput(RotationAngle4/360,setPoint4)));
+
     AngleCurrent5 = angleSensor5.RotationRawToAngle(angleSensor5.getRawRotation());
     angleSensor5.AbsoluteAngleRotation(&RotationAngle5, &AngleCurrent5, &AnglePrevious5);
     errorDist5 = setPoint5 - (RotationAngle5/360);
     motor5.runAtPID(int(pid5.getOutput(RotationAngle5/360,setPoint5)));
-    // // //Set the speed of the motor
-    // motor3.runAtPID(int(pid.getOutput(RotationAngle,setPoint)));
 
-    // AmpsCurrent = motor3.readCurrent();
-    // errorDist = setPoint - AmpsCurrent;
-
-    // //Set the speed of the motor
-    // motor3.runAtPID(int(pid.getOutput(AmpsCurrent,setPoint)));
-    // if(millis() - ourTime > 1000){
-    //   Serial.print("Forward motor speed: ");
-    //   Serial.printf("%g \n", int(pid.getOutput(AmpsCurrent,setPoint)));
-    //   Serial.print("Motor angle: ");
-    //   Serial.printf("%g \n", AngleCurrent);
-    //   ourTime = millis();
-    // }
-    //Motor test
-    // motor3.forward(50000);
-    // delay(2000);
-    // Serial.print("Forward motor current: ");
-    // Serial.printf("%g \n", motor3.readCurrent());
-    // delay(1000);
-    // motor3.fullBackward();
-    // delay(2000);
-    // Serial.print("Backward motor current: ");
-    // Serial.printf("%g \n", motor3.readCurrent());
-    // delay(1000);
-
-
-    // TLC test
-    // Serial.println("HighZ all (5V, 5V)");
-    // motor1.highZ();
-    // motor2.highZ();
-    // motor3.highZ();
-    // motor4.highZ();
-    // motor5.highZ();
-    // delay(5000);
-    // Serial.println("Stopping (0, 0), all");
-    // motor1.stop();
-    // motor2.stop();
-    // motor3.stop();
-    // motor4.stop();
-    // motor5.stop();
-    // delay(5000);
-
-
-
+    if(pidFlag){
+      pid1.setPID(proportional, integral, derivative);
+      pid2.setPID(proportional, integral, derivative);
+      pid3.setPID(proportional, integral, derivative);
+      pid4.setPID(proportional, integral, derivative);
+      pid5.setPID(proportional, integral, derivative);
+      pidFlag = false;
+    }
 }

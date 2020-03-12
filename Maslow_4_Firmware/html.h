@@ -68,6 +68,12 @@ const char HTML[] PROGMEM = R"(
     }, 500 ) ;
 
     setInterval(function ( ) {
+      requestLabelUpdate('proportional');
+      requestLabelUpdate('integral');
+      requestLabelUpdate('derivative');
+    }, 500 ) ;
+
+    setInterval(function ( ) {
         requestErrorPlotUpdate('errorDist1', 'canvas1');
         requestErrorPlotUpdate('errorDist2', 'canvas2');
         requestErrorPlotUpdate('errorDist3', 'canvas3');
@@ -147,7 +153,7 @@ const char HTML[] PROGMEM = R"(
             <span id='errorDist3'> </span>
         </p>
     </div>
-    <div style = 'margin: 0; position: absolute; top: 50%; left: 30%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+    <div style = 'margin: 0; position: absolute; top: 50%; left: 20%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
         <form method='post' action='/settarget' >
             <label class='label'>Target Motor 4:  </label>
             <input type='text' name='setpoint4'/>
@@ -171,7 +177,7 @@ const char HTML[] PROGMEM = R"(
             <span id='errorDist4'> </span>
         </p>
     </div>
-    <div style = 'margin: 0; position: absolute; top: 50%; left: 70%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+    <div style = 'margin: 0; position: absolute; top: 50%; left: 60%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
         <form method='post' action='/settarget' >
             <label class='label'>Target Motor 5:  </label>
             <input type='text' name='setpoint5'/>
@@ -194,6 +200,25 @@ const char HTML[] PROGMEM = R"(
             <span class='dht-labels'>Error Dist:  </span>
             <span id='errorDist5'> </span>
         </p>
+    </div><div style = 'margin: 0; position: absolute; top: 50%; left: 90%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+        <form method='post' action='/settarget' >
+            <label class='label'>P:  </label>
+            <input type='text' name='setproportional'/>
+            <input type='submit' value='Set'>
+            <span id='proportional'> </span>
+        </form>
+        <form method='post' action='/settarget' >
+            <label class='label'>I:  </label>
+            <input type='text' name='setintegral'/>
+            <input type='submit' value='Set'>
+            <span id='integral'> </span>
+        </form>
+        <form method='post' action='/settarget' >
+            <label class='label'>D:</label>
+            <input type='text' name='setderivative'/>
+            <input type='submit' value='Set'>
+            <span id='derivative'> </span>
+        </form>
     </div>
 </body>
 )";
