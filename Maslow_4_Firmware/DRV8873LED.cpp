@@ -79,12 +79,12 @@ void DRV8873LED::runAtPID(int signed_speed){
  */
 void DRV8873LED::runAtSpeed(uint8_t direction, uint16_t speed){
     if(direction == 0){
-        _driver->setPWM(_back, 65535);
-        _driver->setPWM(_forward, 65535 - speed);
-
-    }else{
         _driver->setPWM(_forward, 65535);
         _driver->setPWM(_back, 65535 - speed);
+
+    }else{
+        _driver->setPWM(_back, 65535);
+        _driver->setPWM(_forward, 65535 - speed);
     }
     _driver->write();
 }
