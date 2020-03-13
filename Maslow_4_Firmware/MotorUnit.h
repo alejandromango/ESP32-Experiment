@@ -9,9 +9,9 @@
 #include "DRV8873LED.h"
 #include "AS5048A.h"
 
+enum mode {REVOLUTIONS, CURRENT, DISTANCE, SPEED};
 class MotorUnit{
 public:
-    enum mode {REVOLUTIONS, CURRENT, DISTANCE, SPEED};
     MotorUnit(TLC59711 *tlc,
                uint8_t forwardPin,
                uint8_t backwardPin,
@@ -19,22 +19,35 @@ public:
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
                byte angleCS);
-    void   eStop();
-    void   computePID();
-    void   changePitch(float newPitch);
-    float  getPitch();
-    void   disableControl();
-    void   enableControl();
-    void   updatePIDTune();
-    void   setPIDTune(float kP, float kI, float kD);
+    void   setSetpoint(float newSetpoint);
+    float  getSetpoint();
+    float  getError();
+    float  getOutput();
+    void   setControlMode(mode newMode);
+    mode   getControlMode();
     float  getRevolutionsFromAngle(float angle);
     float  getDistanceFromAngle(float angle);
+    void   setPitch(float newPitch);
+    float  getPitch();
+    void   setPIDTune(float kP, float kI, float kD);
+    void   updatePIDTune();
+    void   computePID();
+    float  getControllerState();
+    void   eStop();
+    void   reset();
+    void   stop();
 
 private:
+    void   _disableControl();
+    void   _enableControl();
+
+
     MiniPID pid;
     DRV8873LED motor;
     AS5048A angleSensor;
-    float      _mmPerRevolution;
+    float _mmPerRevolution = 10;
+    float lastInterval = 0.001;
+    unsigned long lastUpdate = millis();
 
     // PID tunings for revolution position control
     float rProportional = 100000;
@@ -59,6 +72,7 @@ private:
     bool disabled = false;
 
     int output = 0;
+    float currentState = 0.0;
     float setpoint = 0.0;
     float errorDist = 0.0;
 
