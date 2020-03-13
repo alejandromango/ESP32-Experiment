@@ -23,6 +23,7 @@ public:
     float  getSetpoint();
     float  getError();
     float  getOutput();
+    float  getInput();
     void   setControlMode(mode newMode);
     mode   getControlMode();
     float  getRevolutionsFromAngle(float angle);

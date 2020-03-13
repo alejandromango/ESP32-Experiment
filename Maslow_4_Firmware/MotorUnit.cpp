@@ -31,6 +31,10 @@ float MotorUnit::getOutput(){
     return output;
 }
 
+float MotorUnit::getInput(){
+    return currentState;
+}
+
 void MotorUnit::setControlMode(mode newMode){
     controlMode = newMode;
     updatePIDTune();
