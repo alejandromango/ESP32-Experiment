@@ -19,54 +19,42 @@ public:
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
                byte angleCS);
-    void   write(const float& targetPosition);
-    float  read();
-    void   set(const float& newMotorUnitPosition);
-    void   setSteps(const long& steps);
-    int    updatePositionFromEncoder();
-    int    detach();
-    int    attach();
-    void   detachIfIdle();
-    void   endMove(const float& finalTarget);
-    void   stop();
-    float  target();
-    float  error();
-    float  setpoint();
+    void   eStop();
     void   computePID();
-    void   disablePositionPID();
-    void   enablePositionPID();
-    void   setPIDAggressiveness(float aggressiveness);
-    void   test();
-    void   changePitch(float* newPitch);
+    void   changePitch(float newPitch);
     float  getPitch();
-    void   changeEncoderResolution(float* newResolution);
-    bool   attached();
-    MotorGearboxEncoder    motorGearboxEncoder;
-    void   setPIDValues(float* Kp, float* Ki, float* Kd, float* propWeight, float* KpV, float* KiV, float* KdV, float* propWeightV);
-    String     getPIDString();
-    double     pidInput();
-    double     pidOutput();
-    long  steps();
-    float getRevolutionsFromAngle(float angle);
-    float getDistanceFromAngle(float angle);
+    void   disableControl();
+    void   enableControl();
+    void   updatePIDTune();
+    void   setPIDTune(float kP, float kI, float kD);
+    float  getRevolutionsFromAngle(float angle);
+    float  getDistanceFromAngle(float angle);
 
 private:
     MiniPID pid;
     DRV8873LED motor;
     AS5048A angleSensor;
-    int        _PWMread(int pin);
-    void       _writeFloat(const unsigned int& addr, const float& x);
-    float      _readFloat(const unsigned int& addr);
-    unsigned long   _timeLastMoved;
-    volatile double _pidSetpoint;
-    volatile double _pidInput;
-    volatile double _pidOutput;
-    float      *_Kp, *_Ki, *_Kd;
-    PID        _pidController;
     float      _mmPerRevolution;
-    float      *_encoderSteps;
-    bool       _disableMotorUnitForTesting = false;
-    char       _MotorUnitName;
+
+    // PID tunings for revolution position control
+    float rProportional = 100000;
+    float rIntegral = 10;
+    float rDerivative = 0.0;
+
+    // PID tunings for mm position control
+    float mmProportional = 0;
+    float mmIntegral = 0;
+    float mmDerivative = 0;
+
+    // PID tunings for speed control
+    float vProportional = 0;
+    float vIntegral = 0;
+    float vDerivative = 0;
+
+    // PID tunings for current control
+    float ampProportional = 0;
+    float ampIntegral = 0;
+    float ampDerivative = 0;
 
     bool disabled = false;
 
