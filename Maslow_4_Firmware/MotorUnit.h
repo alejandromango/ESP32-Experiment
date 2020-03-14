@@ -10,7 +10,7 @@
 #include "DRV8873LED.h"
 #include "AS5048A.h"
 
-enum mode {REVOLUTIONS, CURRENT, DISTANCE, SPEED};
+enum mode {REVOLUTIONS, CURRENT, DISTANCE, SPEED, MAX = SPEED};
 class MotorUnit{
 
 public:
@@ -38,6 +38,9 @@ public:
     void   setPIDTune(float kP, float kI, float kD);
     void   updatePIDTune();
     void   computePID();
+    float  getP();
+    float  getI();
+    float  getD();
     float  getControllerState();
     void   eStop();
     void   reset();
@@ -70,6 +73,11 @@ private:
     float ampProportional = 0;
     float ampIntegral = 0;
     float ampDerivative = 0;
+
+    // active PID tunings
+    float activeP = 0;
+    float activeI = 0;
+    float activeD = 0;
 
     bool disabled = false;
 

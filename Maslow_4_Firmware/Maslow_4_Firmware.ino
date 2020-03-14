@@ -162,4 +162,15 @@ void loop(){
     motor5.setPIDTune(proportional, integral, derivative);
     pidFlag = false;
   }
+  if(modeFlag){
+    motor1.setControlMode(updatedMode);
+    motor2.setControlMode(updatedMode);
+    motor3.setControlMode(updatedMode);
+    motor4.setControlMode(updatedMode);
+    motor5.setControlMode(updatedMode);
+    proportional = motor1.getP();
+    integral = motor1.getI();
+    derivative = motor1.getD();
+    modeFlag = false;
+  }
 }

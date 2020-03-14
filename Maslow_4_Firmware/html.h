@@ -220,5 +220,12 @@ const char HTML[] PROGMEM = R"(
             <span id='derivative'> </span>
         </form>
     </div>
+    </div><div style = 'margin: 0; position: absolute; top: 90%; left: 80%; -ms-transform: translate(-50%, -0%); transform: translate(-50%, -0%);'>
+    <form method='post' action='/settarget' >
+        <label class='label'>Mode:</label>
+        <input type='text' name='setcontrolmode'/>
+        <input type='submit' value='Set'>
+        <span id='mode'> </span>
+    </form>
 </body>
 )";

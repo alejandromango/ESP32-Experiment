@@ -1,6 +1,8 @@
 #ifndef Commands_h
 #define Commands_h
 
+#include "MotorUnit.h"
+
 float setPoint1 = 0;
 float setPoint2 = 0;
 float setPoint3 = 0;
@@ -12,6 +14,9 @@ float proportional = 100000;
 float integral = 10;
 float derivative = 0.0;
 bool pidFlag = false;
+
+mode updatedMode = REVOLUTIONS;
+bool modeFlag = false;
 
 void parseCommand(String command, String value){
     Serial.println("Parsing Command:");
@@ -48,6 +53,15 @@ void parseCommand(String command, String value){
     if(command == "setderivative"){
         derivative = value.toFloat();
         pidFlag = true;
+    }
+    if(command == "setcontrolmode"){
+        updatedMode = (mode)value.toInt();
+        if(updatedMode > MAX){
+            updatedMode = REVOLUTIONS;
+        }
+        Serial.print("New mode: ");
+        Serial.printf("%i\n", updatedMode);
+        modeFlag = true;
     }
 }
 

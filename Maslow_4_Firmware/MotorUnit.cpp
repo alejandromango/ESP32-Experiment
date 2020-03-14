@@ -85,18 +85,39 @@ void MotorUnit::setPIDTune(float kP, float kI, float kD){
 
 void MotorUnit::updatePIDTune(){
     if(controlMode == CURRENT){
-        pid->setPID(ampProportional, ampIntegral, ampDerivative);
+        activeP = ampProportional;
+        activeI = ampIntegral;
+        activeD = ampDerivative;
     }else if(controlMode == DISTANCE){
-        pid->setPID(mmProportional, mmIntegral, mmDerivative);
+        activeP = mmProportional;
+        activeI = mmIntegral;
+        activeD = mmDerivative;
     }else if(controlMode == SPEED){
-        pid->setPID(vProportional, vIntegral, vDerivative);
+        activeP = vProportional;
+        activeI = vIntegral;
+        activeD = vDerivative;
     }else{
-        pid->setPID(rProportional, rIntegral, rDerivative);
+        activeP = rProportional;
+        activeI = rIntegral;
+        activeD = rDerivative;
     }
+    pid->setPID(activeP, activeI, activeD);
+}
+
+float MotorUnit::getP(){
+    return activeP;
+}
+
+float MotorUnit::getI(){
+    return activeI;
+}
+
+float MotorUnit::getD(){
+    return activeD;
 }
 
 void MotorUnit::computePID(){
-    lastInterval = (millis() - lastUpdate)/1000;
+    lastInterval = (millis() - lastUpdate)/1000.0;
     lastUpdate = millis();
     currentState = getControllerState();
     errorDist = setpoint - currentState;
