@@ -1,5 +1,6 @@
 #ifndef MotorUnit_h
 #define MotorUnit_h
+#include "memory"
 
 #include <Arduino.h>
 #include "TLC59711.h"
@@ -11,6 +12,7 @@
 
 enum mode {REVOLUTIONS, CURRENT, DISTANCE, SPEED};
 class MotorUnit{
+
 public:
     MotorUnit(TLC59711 *tlc,
                uint8_t forwardPin,
@@ -42,10 +44,6 @@ private:
     void   _disableControl();
     void   _enableControl();
 
-
-    MiniPID pid;
-    DRV8873LED motor;
-    AS5048A angleSensor;
     float _mmPerRevolution = 10;
     float lastInterval = 0.001;
     unsigned long lastUpdate = millis();

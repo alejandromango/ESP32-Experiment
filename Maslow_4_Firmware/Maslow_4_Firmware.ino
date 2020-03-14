@@ -2,12 +2,11 @@
 #include <FS.h>
 #include "AsyncTCP.h"
 #include "ESPAsyncWebServer.h" //https://github.com/me-no-dev/ESPAsyncWebServer
-#include "AS5048A.h"
 #include "html.h"
-#include "MiniPID.h" //https://github.com/tekdemo/MiniPID
 #include "TLC59711.h"
-#include "DRV8873LED.h"
+#include "MotorUnit.h"
 #include "comands.h"
+#include "Ticker.h"
 
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
@@ -16,42 +15,6 @@ const char* ssid = "Leek Soup";
 const char* password = "Cranberry Pie";
 
 AsyncWebServer server(80);
-
-float RotationAngle1 = 0.0;
-float AngleCurrent1  = 0.0;
-float AmpsCurrent1  = 0.0;
-float AnglePrevious1 = 0.0;
-float errorDist1 = 0.0;
-
-float RotationAngle2 = 0.0;
-float AngleCurrent2  = 0.0;
-float AmpsCurrent2  = 0.0;
-float AnglePrevious2 = 0.0;
-float errorDist2 = 0.0;
-
-float RotationAngle3 = 0.0;
-float AngleCurrent3  = 0.0;
-float AmpsCurrent3  = 0.0;
-float AnglePrevious3 = 0.0;
-float errorDist3 = 0.0;
-
-float RotationAngle4 = 0.0;
-float AngleCurrent4  = 0.0;
-float AmpsCurrent4  = 0.0;
-float AnglePrevious4 = 0.0;
-float errorDist4 = 0.0;
-
-float RotationAngle5 = 0.0;
-float AngleCurrent5  = 0.0;
-float AmpsCurrent5  = 0.0;
-float AnglePrevious5 = 0.0;
-float errorDist5 = 0.0;
-
-MiniPID pid1 = MiniPID(proportional,integral,derivative);
-MiniPID pid2 = MiniPID(proportional,integral,derivative);
-MiniPID pid3 = MiniPID(proportional,integral,derivative);
-MiniPID pid4 = MiniPID(proportional,integral,derivative);
-MiniPID pid5 = MiniPID(proportional,integral,derivative);
 
 unsigned long ourTime = millis();
 
@@ -67,17 +30,13 @@ esp_err_t config_err_5 = adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTE
 #define tlcData   5
 #define tlcClock  21
 TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
-DRV8873LED motor1 = DRV8873LED(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics);
-DRV8873LED motor2 = DRV8873LED(&tlc, 3, 2, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics);
-DRV8873LED motor3 = DRV8873LED(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics);
-DRV8873LED motor4 = DRV8873LED(&tlc, 7, 6, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics);
-DRV8873LED motor5 = DRV8873LED(&tlc, 9, 8, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics);
+MotorUnit motor1 = MotorUnit(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics, 17);
+MotorUnit motor2 = MotorUnit(&tlc, 3, 2, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics, 3);
+MotorUnit motor3 = MotorUnit(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics, 22);
+MotorUnit motor4 = MotorUnit(&tlc, 7, 6, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics, 25);
+MotorUnit motor5 = MotorUnit(&tlc, 9, 8, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics, 13);
 
-AS5048A angleSensor1(17);
-AS5048A angleSensor2(3);
-AS5048A angleSensor3(22);
-AS5048A angleSensor4(25);
-AS5048A angleSensor5(13);
+Ticker motorTimer = Ticker();
 
 void setup(){
   Serial.begin(115200);
@@ -90,12 +49,6 @@ void setup(){
   }
 
   Serial.println(WiFi.localIP());
-
-  angleSensor1.init();
-  angleSensor2.init();
-  angleSensor3.init();
-  angleSensor4.init();
-  angleSensor5.init();
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/html", HTML);
@@ -116,51 +69,51 @@ void setup(){
   });
 
   server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle1/360, 5).c_str());
+    request->send_P(200, "text/plain", String(motor1.getInput(), 5).c_str());
   });
   server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle2/360, 5).c_str());
+    request->send_P(200, "text/plain", String(motor2.getInput(), 5).c_str());
   });
   server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle3/360, 5).c_str());
+    request->send_P(200, "text/plain", String(motor3.getInput(), 5).c_str());
   });
   server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle4/360, 5).c_str());
+    request->send_P(200, "text/plain", String(motor4.getInput(), 5).c_str());
   });
   server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(RotationAngle5/360, 5).c_str());
+    request->send_P(200, "text/plain", String(motor5.getInput(), 5).c_str());
   });
 
   server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint1, 5).c_str());
+    request->send_P(200, "text/plain", String(motor1.getSetpoint(), 5).c_str());
   });
   server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint2, 5).c_str());
+    request->send_P(200, "text/plain", String(motor2.getSetpoint(), 5).c_str());
   });
   server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint3, 5).c_str());
+    request->send_P(200, "text/plain", String(motor3.getSetpoint(), 5).c_str());
   });
   server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint4, 5).c_str());
+    request->send_P(200, "text/plain", String(motor4.getSetpoint(), 5).c_str());
   });
   server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(setPoint5, 5).c_str());
+    request->send_P(200, "text/plain", String(motor5.getSetpoint(), 5).c_str());
   });
 
   server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist1, 5).c_str());
+    request->send_P(200, "text/plain", String(motor1.getError(), 5).c_str());
   });
   server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist2, 5).c_str());
+    request->send_P(200, "text/plain", String(motor2.getError(), 5).c_str());
   });
   server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist3, 5).c_str());
+    request->send_P(200, "text/plain", String(motor3.getError(), 5).c_str());
   });
   server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist4, 5).c_str());
+    request->send_P(200, "text/plain", String(motor4.getError(), 5).c_str());
   });
   server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(errorDist5, 5).c_str());
+    request->send_P(200, "text/plain", String(motor5.getError(), 5).c_str());
   });
 
   server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -175,52 +128,38 @@ void setup(){
 
   server.begin();
 
-  pid1.setOutputLimits(-65535,65535);
-  pid2.setOutputLimits(-65535,65535);
-  pid3.setOutputLimits(-65535,65535);
-  pid4.setOutputLimits(-65535,65535);
-  pid5.setOutputLimits(-65535,65535);
-
   tlc.begin();
   tlc.write();
+
+  motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
   Serial.println("Setup complete");
 
 }
 
-int motorSpeedValue = 65535;
+void onTimer(){
+  motor1.computePID();
+  motor2.computePID();
+  motor3.computePID();
+  motor4.computePID();
+  motor5.computePID();
+}
 
 void loop(){
-    AngleCurrent1 = angleSensor1.RotationRawToAngle(angleSensor1.getRawRotation());
-    angleSensor1.AbsoluteAngleRotation(&RotationAngle1, &AngleCurrent1, &AnglePrevious1);
-    errorDist1 = setPoint1 - (RotationAngle1/360);
-    motor1.runAtPID(int(pid1.getOutput(RotationAngle1/360,setPoint1)));
-
-    AngleCurrent2 = angleSensor2.RotationRawToAngle(angleSensor2.getRawRotation());
-    angleSensor2.AbsoluteAngleRotation(&RotationAngle2, &AngleCurrent2, &AnglePrevious2);
-    errorDist2 = setPoint2 - (RotationAngle2/360);
-    motor2.runAtPID(int(pid2.getOutput(RotationAngle2/360,setPoint2)));
-
-    AngleCurrent3 = angleSensor3.RotationRawToAngle(angleSensor3.getRawRotation());
-    angleSensor3.AbsoluteAngleRotation(&RotationAngle3, &AngleCurrent3, &AnglePrevious3);
-    errorDist3 = setPoint3 - (RotationAngle3/360);
-    motor3.runAtPID(int(pid3.getOutput(RotationAngle3/360,setPoint3)));
-
-    AngleCurrent4 = angleSensor4.RotationRawToAngle(angleSensor4.getRawRotation());
-    angleSensor4.AbsoluteAngleRotation(&RotationAngle4, &AngleCurrent4, &AnglePrevious4);
-    errorDist4 = setPoint4 - (RotationAngle4/360);
-    motor4.runAtPID(int(pid4.getOutput(RotationAngle4/360,setPoint4)));
-
-    AngleCurrent5 = angleSensor5.RotationRawToAngle(angleSensor5.getRawRotation());
-    angleSensor5.AbsoluteAngleRotation(&RotationAngle5, &AngleCurrent5, &AnglePrevious5);
-    errorDist5 = setPoint5 - (RotationAngle5/360);
-    motor5.runAtPID(int(pid5.getOutput(RotationAngle5/360,setPoint5)));
-
-    if(pidFlag){
-      pid1.setPID(proportional, integral, derivative);
-      pid2.setPID(proportional, integral, derivative);
-      pid3.setPID(proportional, integral, derivative);
-      pid4.setPID(proportional, integral, derivative);
-      pid5.setPID(proportional, integral, derivative);
-      pidFlag = false;
-    }
+  delay(1);
+  if(setpointFlag){
+    motor1.setSetpoint(setPoint1);
+    motor2.setSetpoint(setPoint2);
+    motor3.setSetpoint(setPoint3);
+    motor4.setSetpoint(setPoint4);
+    motor5.setSetpoint(setPoint5);
+    setpointFlag = false;
+  }
+  if(pidFlag){
+    motor1.setPIDTune(proportional, integral, derivative);
+    motor2.setPIDTune(proportional, integral, derivative);
+    motor3.setPIDTune(proportional, integral, derivative);
+    motor4.setPIDTune(proportional, integral, derivative);
+    motor5.setPIDTune(proportional, integral, derivative);
+    pidFlag = false;
+  }
 }

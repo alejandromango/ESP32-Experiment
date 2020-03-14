@@ -1,5 +1,9 @@
 #include "MotorUnit.h"
 
+std::unique_ptr<MiniPID> pid;
+std::unique_ptr<DRV8873LED> motor;
+std::unique_ptr<AS5048A> angleSensor;
+
 MotorUnit::MotorUnit(TLC59711 *tlc,
                uint8_t forwardPin,
                uint8_t backwardPin,
@@ -7,12 +11,12 @@ MotorUnit::MotorUnit(TLC59711 *tlc,
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
                byte angleCS){
-    pid = MiniPID(0,0,0);
+    pid.reset(new MiniPID(0,0,0));
     updatePIDTune();
-    pid.setOutputLimits(-65535,65535);
-    motor = DRV8873LED(tlc, forwardPin, backwardPin, readbackPin, senseResistor, cal);
-    angleSensor = AS5048A(angleCS);
-    angleSensor.init();
+    pid->setOutputLimits(-65535,65535);
+    motor.reset(new DRV8873LED(tlc, forwardPin, backwardPin, readbackPin, senseResistor, cal));
+    angleSensor.reset(new AS5048A(angleCS));
+    angleSensor->init();
 }
 
 void MotorUnit::setSetpoint(float newSetpoint){
@@ -85,15 +89,14 @@ void MotorUnit::setPIDTune(float kP, float kI, float kD){
 
 void MotorUnit::updatePIDTune(){
     if(controlMode == CURRENT){
-        pid.setPID(ampProportional, ampIntegral, ampDerivative);
+        pid->setPID(ampProportional, ampIntegral, ampDerivative);
     }else if(controlMode == DISTANCE){
-        pid.setPID(mmProportional, mmIntegral, mmDerivative);
+        pid->setPID(mmProportional, mmIntegral, mmDerivative);
     }else if(controlMode == SPEED){
-        pid.setPID(vProportional, vIntegral, vDerivative);
+        pid->setPID(vProportional, vIntegral, vDerivative);
     }else{
-        pid.setPID(rProportional, rIntegral, rDerivative);
+        pid->setPID(rProportional, rIntegral, rDerivative);
     }
-    computePID();
 }
 
 void MotorUnit::computePID(){
@@ -101,23 +104,23 @@ void MotorUnit::computePID(){
     lastUpdate = millis();
     currentState = getControllerState();
     errorDist = setpoint - currentState;
-    output = int(pid.getOutput(currentState,setpoint));
+    output = int(pid->getOutput(currentState,setpoint));
 
     if(~disabled){
-        motor.runAtPID(output);
+        motor->runAtPID(output);
     }else{
-        motor.stop();
+        motor->stop();
     }
 }
 
 float MotorUnit::getControllerState(){
     if(controlMode == CURRENT){
-        mampsCurrent = motor.readCurrent();
+        mampsCurrent = motor->readCurrent();
         return mampsCurrent;
     }else{
         previousAngleTotal = angleTotal;
-        angleCurrent = angleSensor.RotationRawToAngle(angleSensor.getRawRotation());
-        angleSensor.AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
+        angleCurrent = angleSensor->RotationRawToAngle(angleSensor->getRawRotation());
+        angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
         if(controlMode == DISTANCE){
             mmPosition = getDistanceFromAngle(angleTotal);
             return mmPosition;
@@ -133,7 +136,7 @@ float MotorUnit::getControllerState(){
 
 void MotorUnit::eStop(){
     _disableControl();
-    motor.stop();
+    motor->stop();
 }
 
 void MotorUnit::reset(){
