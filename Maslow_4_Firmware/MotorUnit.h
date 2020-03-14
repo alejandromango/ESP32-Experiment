@@ -21,6 +21,9 @@ public:
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
                byte angleCS);
+    std::unique_ptr<MiniPID> pid;
+    std::unique_ptr<DRV8873LED> motor;
+    std::unique_ptr<AS5048A> angleSensor;
     void   setSetpoint(float newSetpoint);
     float  getSetpoint();
     float  getError();

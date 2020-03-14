@@ -1,9 +1,5 @@
 #include "MotorUnit.h"
 
-std::unique_ptr<MiniPID> pid;
-std::unique_ptr<DRV8873LED> motor;
-std::unique_ptr<AS5048A> angleSensor;
-
 MotorUnit::MotorUnit(TLC59711 *tlc,
                uint8_t forwardPin,
                uint8_t backwardPin,
