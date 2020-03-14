@@ -1,8 +1,9 @@
-/***************************************************
- *  This is a two-wire library for the TI DRV8873LED chip
+/*!
+ *  @file DRV8873LED.cpp
  *
- *  Two pins are required to send data: clock and data pin.
- ****************************************************/
+ *  This is a library to interact with the TI DRV8873 chip via a peripheral PWM generator chip (TLC59711)
+ *
+ */
 
 #include "DRV8873LED.h"
 
