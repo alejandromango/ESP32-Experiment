@@ -122,6 +122,7 @@ void MotorUnit::computePID(){
     currentState = getControllerState();
     errorDist = setpoint - currentState;
     output = int(pid->getOutput(currentState,setpoint));
+    inRegulation = fabs(errorDist) < accuracy;
 
     if(~disabled){
         motor->runAtPID(output);

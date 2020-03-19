@@ -40,7 +40,7 @@ public:
     double readCurrent();
 
 private:
-    int multisamples = 100;
+    int multisamples = 1;
     TLC59711 *_driver;
     uint8_t _forward, _back;
     adc1_channel_t _readback;

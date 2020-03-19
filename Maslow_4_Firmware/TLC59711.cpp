@@ -44,7 +44,6 @@ void TLC59711::writeMSB(uint8_t d){
         else
             digitalWrite(_dat, LOW);
         digitalWrite(_clk, HIGH);
-        delayMicroseconds(1);
     }
 }
 
@@ -84,9 +83,6 @@ void TLC59711::write(){
             writeMSB(pwmbuffer[n * 12 + c]);
         }
     }
-
-    delayMicroseconds(200);
-
     interrupts();
 }
 

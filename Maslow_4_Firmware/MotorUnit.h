@@ -50,7 +50,7 @@ private:
     void   _disableControl();
     void   _enableControl();
 
-    float _mmPerRevolution = 10;
+    float _mmPerRevolution = 30;
     float lastInterval = 0.001;
     unsigned long lastUpdate = millis();
 
@@ -80,6 +80,9 @@ private:
     float activeD = 0;
 
     bool disabled = false;
+    bool inRegulation = false;
+
+    float accuracy = 0.005; // Accuracy in mm to set in regulation flag
 
     int output = 0;
     float currentState = 0.0;
