@@ -1,20 +1,22 @@
-/*!
- *  @file DRV8873LED.cpp
+/***************************************************
+ *   This is a library to interact with the TI DRV8873 chip via a peripheral
+ *   PWM generator chip (TLC59711)
  *
- *  This is a library to interact with the TI DRV8873 chip via a peripheral PWM generator chip (TLC59711)
- *
- */
+ *  By Alexander Martin-Ginnold for Maslow CNC
+ ****************************************************/
 
 #include "DRV8873LED.h"
 
 /*!
  *  @brief  Instantiates a new DRV8873LED class for generic two-wire control
- *  @param  tlc
- *          LED driver object
- *  @param  forwardPin
- *          LED driver output to run motor forward (if other is at 0%)
- *  @param  backwardPin
- *          LED driver output to run motor backward (if other is at 0%)
+ *  @param  tlc Pointer to a TLC59711 object to output PWM signals
+ *  @param  forwardPin Output pin number for the TLC59711. If this pin is at max
+ *          output and the other pin is at 0 the motor turns forward
+ *  @param  backwardPin Output pin number for the TLC59711. If this pin is at
+ *          max output and the other pin is at 0 the motor turns backward
+ *  @param  readbackPin ESP32 adc_channel_t pin number for current readback
+ *  @param  senseResistor Value in Ohms of the sense resistor for this channel
+ *  @param  cal ESP32 adc calibration results for more accurate readings
  */
 DRV8873LED::DRV8873LED(TLC59711 *tlc,
                        uint8_t forwardPin,

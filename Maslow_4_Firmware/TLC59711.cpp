@@ -4,6 +4,8 @@
  *  Two pins are required to send data: clock and data pin.
  *
  *  Code based on Adafruit_TLC59711 by Limor Fried/Ladyada (Adafruit Industries).
+ *
+ *  By Alexander Martin-Ginnold for Maslow CNC
  ****************************************************/
 
 #include "TLC59711.h"
