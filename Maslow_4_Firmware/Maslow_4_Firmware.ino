@@ -5,6 +5,7 @@
 #include "html.h"
 #include "comands.h"
 #include "Ticker.h"
+#include "maslow_v2.h"
 
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
@@ -18,23 +19,7 @@ AsyncWebServer server(80);
 
 unsigned long ourTime = millis();
 
-esp_adc_cal_characteristics_t *adc_1_characterisitics = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
-esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 1100, adc_1_characterisitics);
-esp_err_t config_err_0 = adc1_config_width(ADC_WIDTH_BIT_12);
-esp_err_t config_err_1 = adc1_config_channel_atten(ADC1_GPIO33_CHANNEL, ADC_ATTEN_DB_2_5);
-esp_err_t config_err_2 = adc1_config_channel_atten(ADC1_GPIO34_CHANNEL, ADC_ATTEN_DB_2_5);
-esp_err_t config_err_3 = adc1_config_channel_atten(ADC1_GPIO36_CHANNEL, ADC_ATTEN_DB_2_5);
-esp_err_t config_err_4 = adc1_config_channel_atten(ADC1_GPIO32_CHANNEL, ADC_ATTEN_DB_2_5);
-esp_err_t config_err_5 = adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTEN_DB_2_5);
-#define NUM_TLC59711 1
-#define tlcData   5
-#define tlcClock  21
-TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
-MotorUnit motor1 = MotorUnit(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics, 17);
-MotorUnit motor2 = MotorUnit(&tlc, 3, 2, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics, 3);
-MotorUnit motor3 = MotorUnit(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics, 22);
-MotorUnit motor4 = MotorUnit(&tlc, 7, 6, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics, 25);
-MotorUnit motor5 = MotorUnit(&tlc, 9, 8, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics, 13);
+machine mill;
 
 Ticker motorTimer = Ticker();
 
@@ -69,51 +54,51 @@ void setup(){
   });
 
   server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1.getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor1->getInput(), 5).c_str());
   });
   server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2.getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor2->getInput(), 5).c_str());
   });
   server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3.getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor3->getInput(), 5).c_str());
   });
   server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4.getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor4->getInput(), 5).c_str());
   });
   server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5.getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor5->getInput(), 5).c_str());
   });
 
   server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1.getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor1->getSetpoint(), 5).c_str());
   });
   server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2.getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor2->getSetpoint(), 5).c_str());
   });
   server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3.getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor3->getSetpoint(), 5).c_str());
   });
   server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4.getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor4->getSetpoint(), 5).c_str());
   });
   server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5.getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor5->getSetpoint(), 5).c_str());
   });
 
   server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1.getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor1->getError(), 5).c_str());
   });
   server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2.getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor2->getError(), 5).c_str());
   });
   server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3.getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor3->getError(), 5).c_str());
   });
   server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4.getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor4->getError(), 5).c_str());
   });
   server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5.getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(mill.motor5->getError(), 5).c_str());
   });
 
   server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -128,8 +113,7 @@ void setup(){
 
   server.begin();
 
-  tlc.begin();
-  tlc.write();
+  mill.machine_init();
 #ifndef BOARD_BRINGUP
   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
 #endif
@@ -138,41 +122,25 @@ void setup(){
 }
 
 void onTimer(){
-  motor1.computePID();
-  motor2.computePID();
-  motor3.computePID();
-  motor4.computePID();
-  motor5.computePID();
+  mill.compute_pid();
 }
 
 void loop(){
 #ifndef BOARD_BRINGUP
   delay(1);
   if(setpointFlag){
-    motor1.setSetpoint(setPoint1);
-    motor2.setSetpoint(setPoint2);
-    motor3.setSetpoint(setPoint3);
-    motor4.setSetpoint(setPoint4);
-    motor5.setSetpoint(setPoint5);
+    mill.update_setpoints(setPoint1, setPoint2, setPoint3, setPoint4, setPoint5);
     setpointFlag = false;
   }
   if(pidFlag){
-    motor1.setPIDTune(proportional, integral, derivative);
-    motor2.setPIDTune(proportional, integral, derivative);
-    motor3.setPIDTune(proportional, integral, derivative);
-    motor4.setPIDTune(proportional, integral, derivative);
-    motor5.setPIDTune(proportional, integral, derivative);
+    mill.update_pid_tunes(proportional, integral, derivative);
     pidFlag = false;
   }
   if(modeFlag){
-    motor1.setControlMode(updatedMode);
-    motor2.setControlMode(updatedMode);
-    motor3.setControlMode(updatedMode);
-    motor4.setControlMode(updatedMode);
-    motor5.setControlMode(updatedMode);
-    proportional = motor1.getP();
-    integral = motor1.getI();
-    derivative = motor1.getD();
+    mill.update_control_mode(updatedMode);
+    proportional = mill.motor1->getP();
+    integral = mill.motor1->getI();
+    derivative = mill.motor1->getD();
     modeFlag = false;
   }
 #else

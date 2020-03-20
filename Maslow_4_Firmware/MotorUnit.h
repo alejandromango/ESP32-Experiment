@@ -27,7 +27,7 @@ public:
     void   setSetpoint(float newSetpoint);
     float  getSetpoint();
     float  getError();
-    int  getOutput();
+    int    getOutput();
     float  getInput();
     void   setControlMode(mode newMode);
     mode   getControlMode();
