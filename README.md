@@ -2,7 +2,9 @@
  A testbed software for the Maslow 5 motor driver board with esp32 control
 
 ## Interface
-The device hosts a web interface with to provide current motor position data, and change some control settings
+The device hosts a web interface with to provide current motor position data, and change some control settings.
+
+The web interface IP address is printed over serial connection when the device first boots up. Connect to serial then press the reset button on your esp32 to see it.
 
 ### Motor Controls
 Each motor can be controlled by setting its setpoint. The units of the setpoint change based on the control mode
