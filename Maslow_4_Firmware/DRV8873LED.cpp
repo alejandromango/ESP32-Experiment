@@ -35,8 +35,7 @@ DRV8873LED::DRV8873LED(TLC59711 *tlc,
 
 /*!
  *  @brief  Run the motors forward at the given speed
- *  @param speed
- *          The speed the motor should spin (0-65535)
+ *  @param speed The speed the motor should spin (0-65535)
  */
 void DRV8873LED::forward(uint16_t speed){
     runAtSpeed(FORWARD, speed);
@@ -51,8 +50,7 @@ void DRV8873LED::fullForward(){
 
 /*!
  *  @brief  Run the motors backward at the given speed
- *  @param speed
- *          The speed the motor should spin (0-65535)
+ *  @param speed The speed the motor should spin (0-65535)
  */
 void DRV8873LED::backward(uint16_t speed){
     runAtSpeed(BACKWARD, speed);
@@ -65,6 +63,11 @@ void DRV8873LED::fullBackward(){
     runAtSpeed(BACKWARD, 65535);
 }
 
+/*!
+ *  @brief  Run the motors at the given speed. Interpret sign as backward for
+ *  negative and forward for positive
+ *  @param speed The speed the motor should spin (-65535 to 65535)
+ */
 void DRV8873LED::runAtPID(int signed_speed){
     if(signed_speed < 0){
         runAtSpeed(BACKWARD, abs(signed_speed));
@@ -74,11 +77,10 @@ void DRV8873LED::runAtPID(int signed_speed){
 }
 
 /*!
- *  @brief  Run the motors in the given direction at the given speed
- *  @param  direction
- *          direction backward (0) or forward (1, or ~0)
- *  @param speed
- *          The speed the motor should spin (0-65535)
+ *  @brief  Run the motors in the given direction at the given speed. All other
+ *  speed setting functions use this to actually write to the outputs
+ *  @param  direction Direction backward (0) or forward (1, or ~0)
+ *  @param speed The speed the motor should spin (0-65535)
  */
 void DRV8873LED::runAtSpeed(uint8_t direction, uint16_t speed){
     if(direction == 0){
@@ -92,7 +94,9 @@ void DRV8873LED::runAtSpeed(uint8_t direction, uint16_t speed){
     _driver->write();
 }
 
-
+/*!
+ *  @brief  Stop the motors in a braking state
+ */
 void DRV8873LED::stop(){
     _driver->setPWM(_forward, 65535);
     _driver->setPWM(_back, 65535);
@@ -100,6 +104,9 @@ void DRV8873LED::stop(){
 
 }
 
+/*!
+ *  @brief  Stop the motors in a high-z state
+ */
 void DRV8873LED::highZ(){
     _driver->setPWM(_forward, 0);
     _driver->setPWM(_back, 0);
@@ -107,6 +114,14 @@ void DRV8873LED::highZ(){
 
 }
 
+/*!
+ *  @brief  Read the value from an ADC and calculate the current. Allows
+ *  multisampling to smooth signal
+ *  NOTE: ESP32 adcs are non-linear and have deadzones at top and bottom.
+ *        This value bottoms out above 0mA!
+ *  @return Calibrated reading of current in mA.
+ *
+ */
 double DRV8873LED::readCurrent(){
     int adcReadback = 0;
     for(int i= 0; i < multisamples; i++){
