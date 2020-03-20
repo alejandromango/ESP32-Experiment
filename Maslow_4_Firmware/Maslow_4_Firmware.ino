@@ -11,6 +11,8 @@
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 
+// #define BOARD_BRINGUP
+
 const char* ssid = "Leek Soup";
 const char* password = "Cranberry Pie";
 
@@ -130,8 +132,9 @@ void setup(){
 
   tlc.begin();
   tlc.write();
-
+#ifndef BOARD_BRINGUP
   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
+#endif
   Serial.println("Setup complete");
 
 }
@@ -145,6 +148,7 @@ void onTimer(){
 }
 
 void loop(){
+#ifndef BOARD_BRINGUP
   delay(1);
   if(setpointFlag){
     motor1.setSetpoint(setPoint1);
@@ -173,4 +177,20 @@ void loop(){
     derivative = motor1.getD();
     modeFlag = false;
   }
+#else
+  Serial.println("Pins high:");
+  motor1.motor->highZ();
+  motor2.motor->highZ();
+  motor3.motor->highZ();
+  motor4.motor->highZ();
+  motor5.motor->highZ();
+  delay(5000);
+  Serial.println("Pins low:");
+  motor1.motor->stop();
+  motor2.motor->stop();
+  motor3.motor->stop();
+  motor4.motor->stop();
+  motor5.motor->stop();
+  delay(5000);
+#endif
 }
