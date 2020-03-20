@@ -12,7 +12,11 @@ The PID tuning inputs set the PID parameters for all motors in the current mode.
 
 ### Control Modes
 An integer input is required to change control modes. There are four options:
-    * 0 - REVOLUTIONS: Sets the position of the motor in number of revolutions from 0
-    * 1 - CURRENT: Sets a constant current in mA for the motor to maintain
-    * 2 - DISTANCE: Sets the position of the motor in distance in mm from 0
-    * 3 - SPEED: Sets to speed of the motor in mm/second
+
+    0 - REVOLUTIONS: Sets the position of the motor in number of revolutions from 0
+
+    1 - CURRENT: Sets a constant current in mA for the motor to maintain
+
+    2 - DISTANCE: Sets the position of the motor in distance in mm from 0
+
+    3 - SPEED: Sets to speed of the motor in mm/second
