@@ -1,6 +1,13 @@
 #include "maslow_v2.h"
 
-void machine::machine_init(){
+std::unique_ptr<TLC59711> tlc;
+std::unique_ptr<MotorUnit> motor1;
+std::unique_ptr<MotorUnit> motor2;
+std::unique_ptr<MotorUnit> motor3;
+std::unique_ptr<MotorUnit> motor4;
+std::unique_ptr<MotorUnit> motor5;
+
+void machine_init(){
     esp_adc_cal_characteristics_t *adc_1_characterisitics = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 1100, adc_1_characterisitics);
     esp_err_t config_err_0 = adc1_config_width(ADC_WIDTH_BIT_12);
@@ -20,7 +27,7 @@ void machine::machine_init(){
     tlc->write();
 }
 
-void machine::compute_pid(){
+void compute_pid(){
     motor1->computePID();
     motor2->computePID();
     motor3->computePID();
@@ -28,7 +35,7 @@ void machine::compute_pid(){
     motor5->computePID();
 }
 
-void machine::update_setpoints(float setpoint_1,
+void update_setpoints(float setpoint_1,
                                float setpoint_2,
                                float setpoint_3,
                                float setpoint_4,
@@ -39,7 +46,7 @@ void machine::update_setpoints(float setpoint_1,
     motor4->setSetpoint(setpoint_4);
     motor5->setSetpoint(setpoint_5);
 }
-void machine::update_pid_tunes(float new_p, float new_i, float new_d){
+void update_pid_tunes(float new_p, float new_i, float new_d){
     motor1->setPIDTune(new_p, new_i, new_d);
     motor2->setPIDTune(new_p, new_i, new_d);
     motor3->setPIDTune(new_p, new_i, new_d);
@@ -47,7 +54,7 @@ void machine::update_pid_tunes(float new_p, float new_i, float new_d){
     motor5->setPIDTune(new_p, new_i, new_d);
 }
 
-void machine::update_control_mode(mode new_mode){
+void update_control_mode(mode new_mode){
     motor1->setControlMode(new_mode);
     motor2->setControlMode(new_mode);
     motor3->setControlMode(new_mode);

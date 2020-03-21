@@ -19,11 +19,11 @@ AsyncWebServer server(80);
 
 unsigned long ourTime = millis();
 
-machine mill;
-
 Ticker motorTimer = Ticker();
 
 void setup(){
+  machine_init();
+
   Serial.begin(115200);
 
   WiFi.begin(ssid, password);
@@ -54,51 +54,51 @@ void setup(){
   });
 
   server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor1->getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor1->getInput(), 5).c_str());
   });
   server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor2->getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor2->getInput(), 5).c_str());
   });
   server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor3->getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor3->getInput(), 5).c_str());
   });
   server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor4->getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor4->getInput(), 5).c_str());
   });
   server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor5->getInput(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor5->getInput(), 5).c_str());
   });
 
   server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor1->getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor1->getSetpoint(), 5).c_str());
   });
   server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor2->getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor2->getSetpoint(), 5).c_str());
   });
   server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor3->getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor3->getSetpoint(), 5).c_str());
   });
   server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor4->getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor4->getSetpoint(), 5).c_str());
   });
   server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor5->getSetpoint(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor5->getSetpoint(), 5).c_str());
   });
 
   server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor1->getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor1->getError(), 5).c_str());
   });
   server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor2->getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor2->getError(), 5).c_str());
   });
   server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor3->getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor3->getError(), 5).c_str());
   });
   server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor4->getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor4->getError(), 5).c_str());
   });
   server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(mill.motor5->getError(), 5).c_str());
+    request->send_P(200, "text/plain", String(motor5->getError(), 5).c_str());
   });
 
   server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -113,7 +113,6 @@ void setup(){
 
   server.begin();
 
-  mill.machine_init();
 #ifndef BOARD_BRINGUP
   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
 #endif
@@ -122,25 +121,25 @@ void setup(){
 }
 
 void onTimer(){
-  mill.compute_pid();
+  compute_pid();
 }
 
 void loop(){
 #ifndef BOARD_BRINGUP
   delay(1);
   if(setpointFlag){
-    mill.update_setpoints(setPoint1, setPoint2, setPoint3, setPoint4, setPoint5);
+    update_setpoints(setPoint1, setPoint2, setPoint3, setPoint4, setPoint5);
     setpointFlag = false;
   }
   if(pidFlag){
-    mill.update_pid_tunes(proportional, integral, derivative);
+    update_pid_tunes(proportional, integral, derivative);
     pidFlag = false;
   }
   if(modeFlag){
-    mill.update_control_mode(updatedMode);
-    proportional = mill.motor1->getP();
-    integral = mill.motor1->getI();
-    derivative = mill.motor1->getD();
+    update_control_mode(updatedMode);
+    proportional = motor1->getP();
+    integral = motor1->getI();
+    derivative = motor1->getD();
     modeFlag = false;
   }
 #else
