@@ -92,8 +92,8 @@ example to change the number of axes
 #include "esp_adc_cal.h"
 
 #define NUM_TLC59711 1
-#define TLC_CLOCK   5
-#define TLC_DATA  21
+#define TLC_CLOCK    21
+#define TLC_DATA     5
 
 #define RSENSE 10000
 #define MOTOR_1_ADC ADC1_GPIO33_CHANNEL
