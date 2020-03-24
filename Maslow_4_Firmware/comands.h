@@ -1,7 +1,8 @@
 #ifndef Commands_h
 #define Commands_h
+void machine_init();
 
-#include "MotorUnit.h"
+// #include "MotorUnit.h"
 
 float setPoint1 = 0;
 float setPoint2 = 0;
@@ -15,7 +16,7 @@ float integral = 10;
 float derivative = 0.0;
 bool pidFlag = false;
 
-mode updatedMode = REVOLUTIONS;
+pid_mode updatedMode = REVOLUTIONS;
 bool modeFlag = false;
 
 void parseCommand(String command, String value){
@@ -55,7 +56,7 @@ void parseCommand(String command, String value){
         pidFlag = true;
     }
     if(command == "setcontrolmode"){
-        updatedMode = (mode)value.toInt();
+        updatedMode = (pid_mode)value.toInt();
         if(updatedMode > MAX){
             updatedMode = REVOLUTIONS;
         }

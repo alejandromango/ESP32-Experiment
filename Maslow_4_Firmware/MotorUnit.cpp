@@ -43,6 +43,16 @@ void MotorUnit::setSetpoint(float newSetpoint){
     setpoint = newSetpoint;
 }
 
+void MotorUnit::step(bool step, bool direction, float mm_per_step){
+    if(step){
+        if(direction){
+            setpoint += mm_per_step;
+        }else{
+            setpoint -= mm_per_step;
+        }
+    }
+}
+
 /*!
  *  @brief  Retrive the current setpoint of the PID loop
  *  @return Setpoint in the appropriate units for the control mode
@@ -79,7 +89,7 @@ float MotorUnit::getInput(){
  *  @brief  Set the active control mode
  *  @param newMode The enum member of the desired mode
  */
-void MotorUnit::setControlMode(mode newMode){
+void MotorUnit::setControlMode(pid_mode newMode){
     controlMode = newMode;
     updatePIDTune();
     stop();
@@ -89,7 +99,7 @@ void MotorUnit::setControlMode(mode newMode){
  *  @brief  Retrive the active control mode
  *  @return The enum member of the current mode
  */
-mode MotorUnit::getControlMode(){
+pid_mode MotorUnit::getControlMode(){
     return controlMode;
 }
 

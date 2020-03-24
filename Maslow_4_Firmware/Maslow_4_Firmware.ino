@@ -53,53 +53,53 @@ void setup(){
     request->redirect("/");
   });
 
-  server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1->getInput(), 5).c_str());
-  });
-  server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2->getInput(), 5).c_str());
-  });
-  server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3->getInput(), 5).c_str());
-  });
-  server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4->getInput(), 5).c_str());
-  });
-  server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5->getInput(), 5).c_str());
-  });
+  // server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor1.getInput(), 5).c_str());
+  // });
+  // server.on("/position2", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor2.getInput(), 5).c_str());
+  // });
+  // server.on("/position3", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor3.getInput(), 5).c_str());
+  // });
+  // server.on("/position4", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor4.getInput(), 5).c_str());
+  // });
+  // server.on("/position5", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor5.getInput(), 5).c_str());
+  // });
 
-  server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1->getSetpoint(), 5).c_str());
-  });
-  server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2->getSetpoint(), 5).c_str());
-  });
-  server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3->getSetpoint(), 5).c_str());
-  });
-  server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4->getSetpoint(), 5).c_str());
-  });
-  server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5->getSetpoint(), 5).c_str());
-  });
+  // server.on("/target1", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor1.getSetpoint(), 5).c_str());
+  // });
+  // server.on("/target2", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor2.getSetpoint(), 5).c_str());
+  // });
+  // server.on("/target3", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor3.getSetpoint(), 5).c_str());
+  // });
+  // server.on("/target4", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor4.getSetpoint(), 5).c_str());
+  // });
+  // server.on("/target5", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor5.getSetpoint(), 5).c_str());
+  // });
 
-  server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor1->getError(), 5).c_str());
-  });
-  server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor2->getError(), 5).c_str());
-  });
-  server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor3->getError(), 5).c_str());
-  });
-  server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor4->getError(), 5).c_str());
-  });
-  server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(motor5->getError(), 5).c_str());
-  });
+  // server.on("/errorDist1", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor1.getError(), 5).c_str());
+  // });
+  // server.on("/errorDist2", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor2.getError(), 5).c_str());
+  // });
+  // server.on("/errorDist3", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor3.getError(), 5).c_str());
+  // });
+  // server.on("/errorDist4", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor4.getError(), 5).c_str());
+  // });
+  // server.on("/errorDist5", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(motor5.getError(), 5).c_str());
+  // });
 
   server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(proportional, 5).c_str());
@@ -137,9 +137,9 @@ void loop(){
   }
   if(modeFlag){
     update_control_mode(updatedMode);
-    proportional = motor1->getP();
-    integral = motor1->getI();
-    derivative = motor1->getD();
+    // proportional = motor1.getP();
+    // integral = motor1.getI();
+    // derivative = motor1.getD();
     modeFlag = false;
   }
 #else
