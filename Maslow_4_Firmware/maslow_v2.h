@@ -66,19 +66,58 @@
 #define MOTOR_5_BACKWARD 8
 #define MOTOR_5_CS 13
 
-#define DC_TOP_LEFT 0
-#define DC_TOP_RIGHT 1
-#define DC_BOTTOM_LEFT 2
-#define DC_BOTTOM_RIGHT 3
-#define DC_Z_AXIS 4
+
+// Set the distance of the point where the cord connects to the sled to the bit
+#define X_TL_OFFSET 0 // mm
+#define X_TR_OFFSET 0 // mm
+#define X_BL_OFFSET 0 // mm
+#define X_BR_OFFSET 0 // mm
+
+#define Y_TL_OFFSET 0 // mm
+#define Y_TR_OFFSET 0 // mm
+#define Y_BL_OFFSET 0 // mm
+#define Y_BR_OFFSET 0 // mm
+
+#define DC_TOP_LEFT X_AXIS
+#define DC_TOP_RIGHT Z_AXIS
+#define DC_BOTTOM_LEFT A_AXIS
+#define DC_BOTTOM_RIGHT B_AXIS
+#define DC_Z_AXIS Y_AXIS
 
 #define DC_TOP_LEFT_STEPS_PER_MM 10 //.1mm per step is required resolution
 #define DC_TOP_RIGHT_STEPS_PER_MM 10
 #define DC_BOTTOM_LEFT_STEPS_PER_MM 10
 #define DC_BOTTOM_RIGHT_STEPS_PER_MM 10
-#define DC_Z_AXIS_STEPS_PER_MM 100 //
+#define DC_Z_AXIS_STEPS_PER_MM 10 //
+
+#define DC_TOP_LEFT_MAX_RATE 100.0 // mm/min
+#define DC_TOP_RIGHT_MAX_RATE 100.0 // mm/min
+#define DC_BOTTOM_LEFT_MAX_RATE 100.0 // mm/min
+#define DC_BOTTOM_RIGHT_MAX_RATE 100.0 // mm/min
+#define DC_Z_AXIS_MAX_RATE 100.0 // mm/min
+
+#define DC_TOP_LEFT_MM_PER_REV 29.92//31.415 // Correct for 10mm pulley
+#define DC_TOP_RIGHT_MM_PER_REV 29.92//31.415
+#define DC_BOTTOM_LEFT_MM_PER_REV 29.92//31.415
+#define DC_BOTTOM_RIGHT_MM_PER_REV 29.92//31.415
+#define DC_Z_AXIS_MM_PER_REV 29.92//31.415 //
+
+// Override defaults
+
+#define DEFAULT_X_STEPS_PER_MM DC_TOP_LEFT_STEPS_PER_MM
+#define DEFAULT_Y_STEPS_PER_MM DC_TOP_RIGHT_STEPS_PER_MM
+#define DEFAULT_Z_STEPS_PER_MM DC_Z_AXIS_STEPS_PER_MM
+#define DEFAULT_A_STEPS_PER_MM DC_BOTTOM_LEFT_STEPS_PER_MM
+#define DEFAULT_B_STEPS_PER_MM DC_BOTTOM_RIGHT_STEPS_PER_MM
+
+#define DEFAULT_X_MAX_RATE DC_TOP_LEFT_MAX_RATE // mm/min
+#define DEFAULT_Y_MAX_RATE DC_TOP_RIGHT_MAX_RATE // mm/min
+#define DEFAULT_Z_MAX_RATE DC_Z_AXIS_MAX_RATE // mm/min
+#define DEFAULT_A_MAX_RATE DC_BOTTOM_LEFT_MAX_RATE // mm/min
+#define DEFAULT_B_MAX_RATE DC_BOTTOM_RIGHT_MAX_RATE // mm/min
 
 #define USE_PIDCONTROL
+// #define USE_KINEMATICS
 #define USE_MACHINE_INIT
 // ================ Custom function Prototypes ======================
 #ifndef maslow_v2_h
@@ -90,16 +129,22 @@
     #include "driver/adc.h"
     #include "esp_adc_cal.h"
 
+    // #error "Imported in header"
+
     void compute_pid();
-    void dc_motor_step(uint8_t step_mask, uint8_t dir_mask);
-    void update_setpoints(float setpoint_1,
-                            float setpoint_2,
-                            float setpoint_3,
-                            float setpoint_4,
-                            float setpoint_5);
-    void update_pid_tunes(float new_p,
-                            float new_i,
-                            float new_d);
+    void pid_step(uint8_t step_mask, uint8_t dir_mask);
+    void pid_get_state();
+    void motor_stop();
+    void update_setpoints(double setpoint_1,
+                            double setpoint_2,
+                            double setpoint_3,
+                            double setpoint_4,
+                            double setpoint_5);
+    bool machine_regulation();
+    void print_setpoints();
+    void update_pid_tunes(double new_p,
+                            double new_i,
+                            double new_d);
 
     void update_control_mode(pid_mode new_mode);
 
