@@ -78,11 +78,11 @@
 #define Y_BL_OFFSET 0 // mm
 #define Y_BR_OFFSET 0 // mm
 
-#define DC_TOP_LEFT X_AXIS
-#define DC_TOP_RIGHT Z_AXIS
-#define DC_BOTTOM_LEFT A_AXIS
-#define DC_BOTTOM_RIGHT B_AXIS
-#define DC_Z_AXIS Y_AXIS
+#define DC_TOP_LEFT 0 //X_AXIS
+#define DC_TOP_RIGHT 2 //Z_AXIS
+#define DC_BOTTOM_LEFT 3 //A_AXIS
+#define DC_BOTTOM_RIGHT 4 //B_AXIS
+#define DC_Z_AXIS 1 //Y_AXIS
 
 #define DC_TOP_LEFT_STEPS_PER_MM 10 //.1mm per step is required resolution
 #define DC_TOP_RIGHT_STEPS_PER_MM 10
@@ -129,8 +129,6 @@
     #include "driver/adc.h"
     #include "esp_adc_cal.h"
 
-    // #error "Imported in header"
-
     void compute_pid();
     void pid_step(uint8_t step_mask, uint8_t dir_mask);
     void pid_get_state();
@@ -147,5 +145,33 @@
                             double new_d);
 
     void update_control_mode(pid_mode new_mode);
+
+// **** Start of "extra" includes to transfer from grbl ****
+
+    // Called if USE_MACHINE_INIT is defined
+void machine_init();
+
+// Called if USE_CUSTOM_HOMING is defined
+bool user_defined_homing();
+
+// Called if USE_KINEMATICS is defined
+// void inverse_kinematics(float* target, plan_line_data_t* pl_data, float* position);
+bool kinematics_pre_homing(uint8_t cycle_mask);
+void kinematics_post_homing();
+
+// Called if USE_FWD_KINEMATIC is defined
+// void forward_kinematics(float* position);
+
+// Called if MACRO_BUTTON_0_PIN or MACRO_BUTTON_1_PIN or MACRO_BUTTON_2_PIN is defined
+void user_defined_macro(uint8_t index);
+
+// Called if USE_M30 is defined
+void user_m30();
+
+// Called if USE_TOOL_CHANGE is defined
+void user_tool_change(uint8_t new_tool);
+
+
+// **** End of "extra" includes to transfer from grbl ****
 
 #endif

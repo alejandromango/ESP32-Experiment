@@ -1,4 +1,6 @@
-#ifdef maslow_v2_h
+// #ifdef maslow_v2_h
+
+#include "maslow_v2.h"
 esp_adc_cal_characteristics_t *adc_1_characterisitics = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
 esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 1100, adc_1_characterisitics);
 esp_err_t config_err_0 = adc1_config_width(ADC_WIDTH_BIT_12);
@@ -30,32 +32,32 @@ void machine_init(){
  Take X, Y, and Z value and
 
 */
-void inverse_kinematics(float *target, plan_line_data_t *pl_data, float *position) {
-    //static float last_angle = 0;
-    //static float last_radius = 0;
-    float x, y, z;                  // distances in each cartesian axis
-    float maslow_target[N_AXIS];    // target location in maslow cable lengths
-    //grbl_sendf(CLIENT_SERIAL, "Position: %4.2f %4.2f %4.2f \r\n", position[X_AXIS] - x_offset, position[Y_AXIS], position[Z_AXIS]);
-    //grbl_sendf(CLIENT_SERIAL, "Target: %4.2f %4.2f %4.2f \r\n", target[X_AXIS] - x_offset, target[Y_AXIS], target[Z_AXIS]);
-    x = target[X_AXIS];
-    y = target[Y_AXIS];
-    z = target[Z_AXIS];
+// void inverse_kinematics(float *target, plan_line_data_t *pl_data, float *position) {
+//     //static float last_angle = 0;
+//     //static float last_radius = 0;
+//     float x, y, z;                  // distances in each cartesian axis
+//     float maslow_target[N_AXIS];    // target location in maslow cable lengths
+//     //grbl_sendf(CLIENT_SERIAL, "Position: %4.2f %4.2f %4.2f \r\n", position[X_AXIS] - x_offset, position[Y_AXIS], position[Z_AXIS]);
+//     //grbl_sendf(CLIENT_SERIAL, "Target: %4.2f %4.2f %4.2f \r\n", target[X_AXIS] - x_offset, target[Y_AXIS], target[Z_AXIS]);
+//     x = target[X_AXIS];
+//     y = target[Y_AXIS];
+//     z = target[Z_AXIS];
 
-    // MASLOWTODO: Drop equations for each of the cable lengths here.
-    maslow_target[DC_TOP_LEFT] = sqrt(pow(x - X_TL_OFFSET, 2) + pow(y - Y_TL_OFFSET, 2));
-    maslow_target[DC_TOP_RIGHT] = sqrt(pow(x_max - x - X_TR_OFFSET, 2) + pow(y - Y_TR_OFFSET, 2));
-    maslow_target[DC_BOTTOM_LEFT] = sqrt(pow(x - X_BL_OFFSET, 2) + pow(y - y_max - Y_BL_OFFSET, 2));
-    maslow_target[DC_BOTTOM_RIGHT] = sqrt(pow(x- x_max - X_BR_OFFSET, 2) + pow(y - y_max - Y_BR_OFFSET, 2));
-    maslow_target[DC_Z_AXIS] = z;
+//     // MASLOWTODO: Drop equations for each of the cable lengths here.
+//     maslow_target[DC_TOP_LEFT] = sqrt(pow(x - X_TL_OFFSET, 2) + pow(y - Y_TL_OFFSET, 2));
+//     maslow_target[DC_TOP_RIGHT] = sqrt(pow(x_max - x - X_TR_OFFSET, 2) + pow(y - Y_TR_OFFSET, 2));
+//     maslow_target[DC_BOTTOM_LEFT] = sqrt(pow(x - X_BL_OFFSET, 2) + pow(y - y_max - Y_BL_OFFSET, 2));
+//     maslow_target[DC_BOTTOM_RIGHT] = sqrt(pow(x- x_max - X_BR_OFFSET, 2) + pow(y - y_max - Y_BR_OFFSET, 2));
+//     maslow_target[DC_Z_AXIS] = z;
 
-    Serial.printf("Targets, Clockwise: %f, %f, %f, %f",
-                                maslow_target[DC_TOP_LEFT],
-                                maslow_target[DC_TOP_RIGHT],
-                                maslow_target[DC_BOTTOM_LEFT],
-                                maslow_target[DC_BOTTOM_RIGHT]);
+//     Serial.printf("Targets, Clockwise: %f, %f, %f, %f",
+//                                 maslow_target[DC_TOP_LEFT],
+//                                 maslow_target[DC_TOP_RIGHT],
+//                                 maslow_target[DC_BOTTOM_LEFT],
+//                                 maslow_target[DC_BOTTOM_RIGHT]);
 
-    mc_line(maslow_target, pl_data);
-}
+//     mc_line(maslow_target, pl_data);
+// }
 
 /*
   user_defined_homing() is called at the begining of the normal Grbl_ESP32 homing
@@ -74,14 +76,14 @@ bool user_defined_homing()
  Forward kinematics for maslow CNC
  MASLOWTODO: Back calculate the XYZ position based on the actual cable lengths.
 */
-void forward_kinematics(float *position) {
-    float original_position[N_AXIS];  // temporary storage of original
-    float print_position[N_AXIS];
-    int32_t current_position[N_AXIS];  // Copy current state of the system position variable
-    memcpy(current_position, sys_position, sizeof(sys_position));
-    system_convert_array_steps_to_mpos(print_position, current_position);
+// void forward_kinematics(float *position) {
+//     float original_position[N_AXIS];  // temporary storage of original
+//     float print_position[N_AXIS];
+//     int32_t current_position[N_AXIS];  // Copy current state of the system position variable
+//     memcpy(current_position, sys_position, sizeof(sys_position));
+//     system_convert_array_steps_to_mpos(print_position, current_position);
 
-}
+// }
 
 /*
   kinematics_pre_homing() is called before normal homing
@@ -178,4 +180,4 @@ void update_control_mode(pid_mode new_mode){
     motor4.setControlMode(new_mode);
     motor5.setControlMode(new_mode);
 }
-#endif
+// #endif
