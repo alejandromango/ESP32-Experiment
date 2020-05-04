@@ -5,8 +5,8 @@
 #include <SPI.h>
 //#include <math.h>
 
-//#include <stdio.h> 
-//#include <stdlib.h>   
+//#include <stdio.h>
+//#include <stdlib.h>
 
 class AS5048A{
 
@@ -74,17 +74,17 @@ class AS5048A{
   /**
    * Returns the physical quantity in angular degrees, obtained from a binary 14 bit ADC number
    */
-  float RotationRawToAngle (word DiscreteCode);
-  
+  double RotationRawToAngle (word DiscreteCode);
+
   /**
    * Returns the physical quantity in angular radians, obtained from the binary 14-bit ADC number
    */
-  float RotationRawToRadian(word DiscreteCode);
+  double RotationRawToRadian(word DiscreteCode);
 
   /**
-  * Returns the incremental and decrementing rotation angle in the variable RotationAngle. The variable addresses are passed to the procedure. 
+  * Returns the incremental and decrementing rotation angle in the variable RotationAngle. The variable addresses are passed to the procedure.
   */
-  void AbsoluteAngleRotation (float *RotationAngle, float *AngleCurrent, float *AnglePrevious);
+  void AbsoluteAngleRotation (double *RotationAngle, double *AngleCurrent, double *AnglePrevious);
 
   /**
   * Function to sort ascending
@@ -94,13 +94,13 @@ class AS5048A{
   /**
   * Returns the angle minutes
   */
-  float GetAngularMinutes (float AngleAbsolute);
+  double GetAngularMinutes (double AngleAbsolute);
 
   /**
   * Returns seconds of angle
   */
-  float GetAngularSeconds (float AngleAbsolute);
-  
+  double GetAngularSeconds (double AngleAbsolute);
+
   /**
   *Returns the movement of the spur gear in mm
   *WheelRotationAngle - Angle of rotation of the wheel
@@ -108,15 +108,15 @@ class AS5048A{
   *NumberGearTeeth - The number of wheel teeth (gears) or the number of worm hits
   *(PI * NormalModule) - Front Pitch
   *20 - the angle of the tooth
-  */ 
-  float LinearDisplacementRack ( float WheelRotationAngle, float NormalModule, float NumberGearTeeth);
-  
+  */
+  double LinearDisplacementRack ( double WheelRotationAngle, double NormalModule, double NumberGearTeeth);
+
   /**
   *Returns the movement of the screw in mm
   *StepGroove - screw thread pitch
   *ScrewRotationAngle - screw rotation angle
-  */ 
-  float LinearMotionHelicalGear ( float ScrewRotationAngle, float StepGroove);
+  */
+  double LinearMotionHelicalGear ( double ScrewRotationAngle, double StepGroove);
 
   /**
    * returns the value of the state register
@@ -139,24 +139,24 @@ class AS5048A{
    * Get and clear the error register by reading it
    */
   word getErrors();
-  
+
   /**
    * Get and clear the error register and output the register value to the Serial port
    */
   void printErrors();
-  
+
   /**
    *The function sends the NOP command and returns the contents of the register. The NOP team is a fake
    *write to register x0000 sensor AS5048
    */
   word DummyOperNoInf();
-  
+
   /**
    *The procedure records the absolute value measured by the sensor AS5048, a randomly located magnet on the axis of rotation,
    *as zero angle position
    */
   void ProgAbsolAngleZeroPosit ();
-  
+
   /**
    * Set the zero position
    */
@@ -172,8 +172,8 @@ class AS5048A{
    */
   bool error();
 
-  
-  
+
+
   private:
   /**
    * returns the parity bit

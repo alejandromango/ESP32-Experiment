@@ -21,29 +21,33 @@ public:
                adc1_channel_t readbackPin,
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
-               byte angleCS);
+               byte angleCS,
+               double mmPerRev,
+               double desiredAccuracy);
     std::unique_ptr<MiniPID> pid;
     std::unique_ptr<DRV8873LED> motor;
     std::unique_ptr<AS5048A> angleSensor;
-    void   setSetpoint(float newSetpoint);
-    float  getSetpoint();
-    void   step(bool step, bool direction, float mm_per_step);
-    float  getError();
+    void   setSetpoint(double newSetpoint);
+    double  getSetpoint();
+    void   step(bool step, bool direction, double mm_per_step);
+    double  getError();
     int    getOutput();
-    float  getInput();
+    double  getInput();
+    bool   getRegulationState();
     void   setControlMode(pid_mode newMode);
     pid_mode   getControlMode();
-    float  getRevolutionsFromAngle(float angle);
-    float  getDistanceFromAngle(float angle);
-    void   setPitch(float newPitch);
-    float  getPitch();
-    void   setPIDTune(float kP, float kI, float kD);
+    double  getRevolutionsFromAngle(double angle);
+    double  getDistanceFromAngle(double angle);
+    void   setPitch(double newPitch);
+    double  getPitch();
+    void   setPIDTune(double kP, double kI, double kD);
     void   updatePIDTune();
     void   computePID();
-    float  getP();
-    float  getI();
-    float  getD();
-    float  getControllerState();
+    double  getP();
+    double  getI();
+    double  getD();
+    void    updateControllerState();
+    double  getControllerState();
     void   eStop();
     void   reset();
     void   stop();
@@ -52,55 +56,55 @@ private:
     void   _disableControl();
     void   _enableControl();
 
-    float _mmPerRevolution = 30;
-    float lastInterval = 0.001;
+    double _mmPerRevolution = 1;
+    double lastInterval = 0.001;
     unsigned long lastUpdate = millis();
 
     // PID tunings for revolution position control
-    float rProportional = 100000;
-    float rIntegral = 10;
-    float rDerivative = 0.0;
+    double rProportional = 100000;
+    double rIntegral = 10;
+    double rDerivative = 0.0;
 
     // PID tunings for mm position control
-    float mmProportional = 0;
-    float mmIntegral = 0;
-    float mmDerivative = 0;
+    double mmProportional = 300000;// 600000; Commented values for 24v 100rpm gearmotor.
+    double mmIntegral = 200;// 20;            Active values for 6v 30 RPM  gearmotor
+    double mmDerivative = 0;// 200000;
 
     // PID tunings for speed control
-    float vProportional = 0;
-    float vIntegral = 0;
-    float vDerivative = 0;
+    double vProportional = 0;
+    double vIntegral = 0;
+    double vDerivative = 0;
 
     // PID tunings for current control
-    float ampProportional = 0;
-    float ampIntegral = 0;
-    float ampDerivative = 0;
+    double ampProportional = 0;
+    double ampIntegral = 0;
+    double ampDerivative = 0;
 
     // active PID tunings
-    float activeP = 0;
-    float activeI = 0;
-    float activeD = 0;
+    double activeP = 0;
+    double activeI = 0;
+    double activeD = 0;
 
     bool disabled = false;
     bool inRegulation = false;
 
-    float accuracy = 0.005; // Accuracy in mm to set in regulation flag
+    double accuracy = 0.05; // Accuracy in mm to set in regulation flag
 
     int output = 0;
-    float currentState = 0.0;
-    float setpoint = 0.0;
-    float errorDist = 0.0;
+    double currentState = 0.0;
+    double setpoint = 0.0;
+    double errorDist = 0.0;
 
-    float angleTotal = 0.0;
-    float previousAngleTotal = 0.0;
-    float revolutionPosition = 0.0;
-    float mmPosition = 0.0;
-    float mmPerSecond = 0.0;
-    float angleCurrent  = 0.0;
-    float anglePrevious = 0.0;
+    double angleTotal = 0.0;
+    double previousAngleTotal = 0.0;
+    double revolutionPosition = 0.0;
+    double mmPosition = 0.0;
+    double mmPerSecond = 0.0;
+    double angleCurrent  = 0.0;
+    double anglePrevious = 0.0;
 
-    float mampsCurrent  = 0.0;
-    pid_mode controlMode = REVOLUTIONS;
+    double mampsCurrent  = 0.0;
+    pid_mode controlMode = DISTANCE;
 
 };
 

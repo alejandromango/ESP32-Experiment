@@ -19,7 +19,7 @@ const int AS5048A_ANGLE                         = 0x3FFF; // Angular output valu
  */
 AS5048A::AS5048A(byte Arg_Cs){
   _cs = Arg_Cs;
-  _errorFlag = false; 
+  _errorFlag = false;
   _position = 0;
 }
 
@@ -29,7 +29,7 @@ AS5048A::AS5048A(byte Arg_Cs){
  * Sets up the SPI interface
  */
 void AS5048A::init(){
-  /** 
+  /**
   * 1MHz clock (AMS should be able to accept up to 10MHz)
   * mySettting (speedMaximum, dataOrder, dataMode)
   * speedMaximum - maximum connection speed. For an SPI chip rated for up to 20 MHz, use 20,000,000.
@@ -39,14 +39,14 @@ void AS5048A::init(){
   * SPI_MODE1 (Signal level (CPOL) -0, Phase (CPHA) -1)
   * SPI_MODE2 (Signal level (CPOL) -1, Phase (CPHA) -0)
   * SPI_MODE3 (Signal level (CPOL) -1, Phase (CPHA) -1)
-  * f(sample) = Min-10.2, Typ-11.25, Max-12.4. (kHz) 
+  * f(sample) = Min-10.2, Typ-11.25, Max-12.4. (kHz)
   * Supported I2C AS5048B Modes:
   * • Random / sequential read
   * • Byte / Write page
   * • Standard: 0 to 100 kHz, clock frequency (slave mode)
   * • Fast mode: clock frequency from 0 to 400 kHz (slave mode)
   * • High speed: 0 to 3.4 MHz clock frequency (slave mode)
-  */    
+  */
   settings = SPISettings(1000000, MSBFIRST, SPI_MODE1);
  // initialization of the Slave Select pin if the LOW slave interacts with the master if the HIGH slave ignores the signals from the master
   pinMode(_cs, OUTPUT);
@@ -65,7 +65,7 @@ void AS5048A::close(){
 /**
  * Utility function used to calculate even parity of word
  * Calculation of the parity bit of the 14-bit address and writing to the 15th bit of the returned 16-bit word
- */ 
+ */
 byte AS5048A::spiCalcEvenParity(word Value){
   /**byte cnt = 0;
   byte i;
@@ -78,7 +78,7 @@ byte AS5048A::spiCalcEvenParity(word Value){
     Value >>= 1;
   }
   return cnt & 0x1;*/
-  
+
   byte operand_compare =  bitRead(Value,0);
   byte i = 1;
   do{
@@ -116,28 +116,28 @@ word AS5048A::getRawRotation(bool EnableMedianValue){
 /**
  *Returns the physical quantity in angular degrees, obtained from a binary 14 bit ADC number
  */
-float AS5048A::RotationRawToAngle(word DiscreteCode){
-  return DiscreteCode * (360.0 / float(AS5048A_ANGLE));
+double AS5048A::RotationRawToAngle(word DiscreteCode){
+  return DiscreteCode * (360.0 / double(AS5048A_ANGLE));
 }
 
 /**
  * Returns the physical quantity in angular radians, obtained from the binary 14-bit ADC number
  */
-float AS5048A::RotationRawToRadian(word DiscreteCode){
-  return DiscreteCode * ((2 * PI) / float(AS5048A_ANGLE));
+double AS5048A::RotationRawToRadian(word DiscreteCode){
+  return DiscreteCode * ((2 * PI) / double(AS5048A_ANGLE));
 }
 
 /**
  * Returns the incremental and decrementing angle of rotation into the variable RotationAngle. The variable addresses are changed in the procedure.
  */
-void AS5048A::AbsoluteAngleRotation (float *RotationAngle, float *AngleCurrent, float *AnglePrevious){
+void AS5048A::AbsoluteAngleRotation (double *RotationAngle, double *AngleCurrent, double *AnglePrevious){
 
   if (*AngleCurrent != *AnglePrevious){
-    
+
     //A transition from high to low
     if ((*AngleCurrent < 90) && (*AnglePrevious > 270)){
             *RotationAngle += abs(360 - abs(*AngleCurrent - *AnglePrevious));
-    }  
+    }
     //A transition from low to high
     else if ((*AnglePrevious < 90) && (*AngleCurrent > 270)){
             *RotationAngle -= abs(360 - abs(*AngleCurrent - *AnglePrevious));
@@ -145,7 +145,7 @@ void AS5048A::AbsoluteAngleRotation (float *RotationAngle, float *AngleCurrent, 
     //We've just moved a bit up
     else {
         *RotationAngle += (*AngleCurrent - *AnglePrevious);
-    } 
+    }
   }
   *AnglePrevious = *AngleCurrent;
 }
@@ -153,7 +153,7 @@ void AS5048A::AbsoluteAngleRotation (float *RotationAngle, float *AngleCurrent, 
 /**
 *returns the angle minutes
 */
-float AS5048A::GetAngularMinutes (float AngleAbsolute){
+double AS5048A::GetAngularMinutes (double AngleAbsolute){
   return ( AngleAbsolute - int(AngleAbsolute) ) * 60;
 
 }
@@ -161,7 +161,7 @@ float AS5048A::GetAngularMinutes (float AngleAbsolute){
 /**
 *returns seconds of angle
 */
-float AS5048A::GetAngularSeconds (float AngleAbsolute){
+double AS5048A::GetAngularSeconds (double AngleAbsolute){
   return (AS5048A::GetAngularMinutes(AngleAbsolute) - int(AS5048A::GetAngularMinutes(AngleAbsolute)) ) * 60;
 }
 
@@ -172,17 +172,17 @@ float AS5048A::GetAngularSeconds (float AngleAbsolute){
 *NumberGearTeeth - The number of teeth of the wheel or the number of visits of the worm
 *(PI * NormalModule) - Front Pitch
 *20 - the angle of the tooth
-*/ 
-float AS5048A::LinearDisplacementRack ( float WheelRotationAngle, float NormalModule, float NumberGearTeeth){
+*/
+double AS5048A::LinearDisplacementRack ( double WheelRotationAngle, double NormalModule, double NumberGearTeeth){
   return WheelRotationAngle * (( ( (PI * NormalModule) / cos(radians(20)) ) * NumberGearTeeth) / 360);
-} 
+}
 
 /**
 *returns the movement of the screw in mm
 *StepGroove - screw thread pitch
 *ScrewRotationAngle - screw rotation angle
-*/ 
-float AS5048A::LinearMotionHelicalGear ( float ScrewRotationAngle, float StepGroove){  
+*/
+double AS5048A::LinearMotionHelicalGear ( double ScrewRotationAngle, double StepGroove){
   return (ScrewRotationAngle * (StepGroove / 360));
 }
 
@@ -212,7 +212,7 @@ void AS5048A::printState(){
   Serial.println("0 is a high magnetic field");
   //Serial.println(lowByte(data), BIN);
   Serial.println(lowByte(data), DEC);
-  
+
 /**Diagnostic Functions AS5048
   * See Figure 22 register address x3FFD (AS5048A) or Figure 31 register address 251 dec (AS5048B)
   * • OCF (Offset Compensation Finished), logic high indicates the finished Offset Compensation Algorithm. After power up the flag remains always to logic high.
@@ -282,14 +282,14 @@ void AS5048A::printErrors(){
   Serial.println(bitRead(data,2), DEC);
   Serial.println(" ");
   //Serial.println(data, BIN);
-} 
+}
 
 /**
  *The function sends the NOP command and returns the contents of the register. The NOP team is a fake
  *write to register x0000 sensor AS5048
- */ 
+ */
 word AS5048A::DummyOperNoInf(){
-  return AS5048A::read(AS5048A_NOP,false);  
+  return AS5048A::read(AS5048A_NOP,false);
 }
 
 /**
@@ -297,9 +297,9 @@ word AS5048A::DummyOperNoInf(){
  *as zero angle position
 
 AS5048 programming
-Zero Position Programming: The absolute angle position can be programmed through the interface. This can be useful for randomly 
-placing the magnet on the axis of rotation. A mechanical zero reading can be performed and written back to the IC. With constant 
-programming, the position is not reversible, stored in the IC. This programming can only be done once. To simplify the calculation 
+Zero Position Programming: The absolute angle position can be programmed through the interface. This can be useful for randomly
+placing the magnet on the axis of rotation. A mechanical zero reading can be performed and written back to the IC. With constant
+programming, the position is not reversible, stored in the IC. This programming can only be done once. To simplify the calculation
 of the zero position, it is only necessary to record the value in the IC, which was previously read from the angle register.
 
 Programming sequence with verification: to program a zero position, the following sequence must be performed:
@@ -315,30 +315,30 @@ Now record the zero position. If you want to write the value of the OTP register
 7. Set the Verify bit to reload OTP data into internal registers.
 8. Read the current angle information for verification (equal to 0).
 
-Programming can be done in 5 V mode using an internal LDO or 3V, but with a minimum supply voltage of 3.3 V. 
+Programming can be done in 5 V mode using an internal LDO or 3V, but with a minimum supply voltage of 3.3 V.
 In the case of 3 V operation, a 10 µF capacitor on the VDD3 pin is also required.
  */
 
 void AS5048A::ProgAbsolAngleZeroPosit(){
   word rotationzero = 0b0000000000000000;
   word programcontrol = 0b00000000000000;
-  
-  AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_HIGH, AS5048A_NOP & ~0xFF00); 
-  AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_LOW, AS5048A_NOP & ~0xFFC0); 
-  
+
+  AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_HIGH, AS5048A_NOP & ~0xFF00);
+  AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_LOW, AS5048A_NOP & ~0xFFC0);
+
   rotationzero |= AS5048A::getRawRotation();
-  
+
   AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_HIGH, (rotationzero >> 6) & 0xFF);
   AS5048A::write(AS5048A_OTP_REGISTER_ZERO_POS_LOW, rotationzero & 0x3F);
-  
+
   AS5048A::write(AS5048A_PROGRAMMING_CONTROL, bitSet(programcontrol,0));
   AS5048A::write(AS5048A_PROGRAMMING_CONTROL, bitSet(programcontrol,3));
-  
+
   if (1 < AS5048A::getRawRotation() < -1){
     AS5048A::write(AS5048A_PROGRAMMING_CONTROL, bitSet(programcontrol,6));
   }
 
-  Serial.println(AS5048A::getRawRotation(), DEC); 
+  Serial.println(AS5048A::getRawRotation(), DEC);
 }
 
 /**
@@ -358,31 +358,31 @@ word AS5048A::getZeroPosition(){
 /**
  * ascending sort function
  */
-void AS5048A::quickSort(word *Arr, int Left, int Right) { 
-  int i = Left, j = Right; 
-  int tmp; 
-  word pivot = Arr[(Left + Right) / 2]; 
+void AS5048A::quickSort(word *Arr, int Left, int Right) {
+  int i = Left, j = Right;
+  int tmp;
+  word pivot = Arr[(Left + Right) / 2];
 
-  /* partition */ 
-  while (i <= j) { 
-    while (Arr[i] < pivot) 
-      i++; 
-    while (Arr[j] > pivot) 
-      j--; 
-    if (i <= j) { 
-      tmp = Arr[i]; 
-      Arr[i] = Arr[j]; 
-      Arr[j] = tmp; 
-      i++; 
-      j--; 
-    } 
-  } 
+  /* partition */
+  while (i <= j) {
+    while (Arr[i] < pivot)
+      i++;
+    while (Arr[j] > pivot)
+      j--;
+    if (i <= j) {
+      tmp = Arr[i];
+      Arr[i] = Arr[j];
+      Arr[j] = tmp;
+      i++;
+      j--;
+    }
+  }
 
-  /* recursion */ 
-  if (Left < j) 
-    AS5048A::quickSort(Arr, Left, j); 
-  if (i < Right) 
-    AS5048A::quickSort(Arr, i, Right); 
+  /* recursion */
+  if (Left < j)
+    AS5048A::quickSort(Arr, Left, j);
+  if (i < Right)
+    AS5048A::quickSort(Arr, i, Right);
 }
 
 /**
@@ -403,15 +403,15 @@ word AS5048A::read(word RegisterAddress, bool MeanValueMedian){
   word readdata;
   word array_data[16];
   word command = 0b0100000000000000; // PAR=0 R/W=R
-  
+
   command |= RegisterAddress;
-  
+
   //Add a parity bit on the the MSB
   command |= ((word)spiCalcEvenParity(command)<<15);
-  
+
   //SPI - begin transaction
   SPI.beginTransaction(settings);
-  
+
   digitalWrite(_cs, LOW);
   SPI.transfer16(command);
   digitalWrite(_cs, HIGH);
@@ -423,30 +423,30 @@ word AS5048A::read(word RegisterAddress, bool MeanValueMedian){
     Serial.print(") with command: 0b");
     Serial.println(command, BIN);
   #endif
-  
+
   //Send the command and Now read the response
   if (MeanValueMedian == true){
-  
+
     for ( byte i = 0; i < 16; i++){
       digitalWrite(_cs, LOW);
       array_data[i] = SPI.transfer16(command) & ~0xC000;
       digitalWrite(_cs, HIGH);
-      //Serial.println(array_data[i], BIN);   
+      //Serial.println(array_data[i], BIN);
     }
 
     AS5048A::quickSort(array_data, 0, 15);
-    readdata = ( array_data[8]  + array_data[9]  ) / 2 ;  
-    
+    readdata = ( array_data[8]  + array_data[9]  ) / 2 ;
+
     SPI.endTransaction();
     //SPI - end transaction
-    
+
     //Return the data, stripping the parity and error bits
-    return readdata;  
+    return readdata;
   }else{
     digitalWrite(_cs, LOW);
     readdata = SPI.transfer16(command);
     digitalWrite(_cs, HIGH);
-    
+
     #ifdef AS5048A_DEBUG
       Serial.print("Read returned: ");
       Serial.print(highByte(readdata), BIN);
@@ -463,14 +463,14 @@ word AS5048A::read(word RegisterAddress, bool MeanValueMedian){
     }else {
       _errorFlag = false;
     }
-    
+
     SPI.endTransaction();
     //SPI - end transaction
-    
+
     //Return the data, stripping the parity and error bits
     return readdata & ~0xC000;
   }
-  
+
 }
 
 
@@ -484,16 +484,16 @@ word AS5048A::read(word RegisterAddress, bool MeanValueMedian){
 word AS5048A::write(word RegisterAddress, word WriteData) {
   word command = 0b0000000000000000; // PAR=0 R/W=W
   word dataToSend = 0b0000000000000000;
-  
+
   command |= RegisterAddress;
   dataToSend |= WriteData;
-  
+
   //Add a parity bit on the the MSB
   command |= ((word)spiCalcEvenParity(command) << 15);
-  
+
   //Craft another packet including the data and parity
   dataToSend |= ((word)spiCalcEvenParity(dataToSend) << 15);
-  
+
 #ifdef AS5048A_DEBUG
   Serial.print("Write (0x");
   Serial.print(RegisterAddress, HEX);
@@ -518,7 +518,7 @@ word AS5048A::write(word RegisterAddress, word WriteData) {
   digitalWrite(_cs, LOW);
   SPI.transfer16(dataToSend);
   digitalWrite(_cs, HIGH);
-  
+
   //Send a NOP to get the new data in the register
   digitalWrite(_cs, LOW);
   dataToSend = SPI.transfer16(AS5048A_NOP);

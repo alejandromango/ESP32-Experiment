@@ -26,7 +26,11 @@ MotorUnit::MotorUnit(TLC59711 *tlc,
                adc1_channel_t readbackPin,
                double senseResistor,
                esp_adc_cal_characteristics_t *cal,
-               byte angleCS){
+               byte angleCS,
+               double mmPerRev,
+               double desiredAccuracy){
+    _mmPerRevolution = mmPerRev;
+    accuracy = desiredAccuracy;
     pid.reset(new MiniPID(0,0,0));
     updatePIDTune();
     pid->setOutputLimits(-65535,65535);
@@ -39,13 +43,13 @@ MotorUnit::MotorUnit(TLC59711 *tlc,
  *  @brief  Set a new setpoint for the PID loop
  *  @param newSetpoint Setpoint in the appropriate units for the control mode
  */
-void MotorUnit::setSetpoint(float newSetpoint){
+void MotorUnit::setSetpoint(double newSetpoint){
     setpoint = newSetpoint;
 }
 
-void MotorUnit::step(bool step, bool direction, float mm_per_step){
+void MotorUnit::step(bool step, bool direction, double mm_per_step){
     if(step){
-        if(direction){
+        if(!direction){
             setpoint += mm_per_step;
         }else{
             setpoint -= mm_per_step;
@@ -57,7 +61,7 @@ void MotorUnit::step(bool step, bool direction, float mm_per_step){
  *  @brief  Retrive the current setpoint of the PID loop
  *  @return Setpoint in the appropriate units for the control mode
  */
-float MotorUnit::getSetpoint(){
+double MotorUnit::getSetpoint(){
     return setpoint;
 }
 
@@ -65,7 +69,7 @@ float MotorUnit::getSetpoint(){
  *  @brief  Retrive the current error of the PID loop
  *  @return Error in the appropriate units for the control mode
  */
-float MotorUnit::getError(){
+double MotorUnit::getError(){
     return errorDist;
 }
 
@@ -81,8 +85,16 @@ int MotorUnit::getOutput(){
  *  @brief  Retrive the current input to the PID loop
  *  @return Current motor state in the appropriate units for the control mode
  */
-float MotorUnit::getInput(){
+double MotorUnit::getInput(){
     return currentState;
+}
+
+/*!
+ *  @brief  Retrive the current regulation state of the PID loop
+ *  @return A bool representing whether or not the PID loop is within accuracy requirements
+ */
+bool MotorUnit::getRegulationState(){
+    return inRegulation;
 }
 
 /*!
@@ -108,7 +120,7 @@ pid_mode MotorUnit::getControlMode(){
  *  @param angle Total angle displacement from 0 in degrees
  *  @return Total revolutions displacement from 0
  */
-float MotorUnit::getRevolutionsFromAngle(float angle){
+double MotorUnit::getRevolutionsFromAngle(double angle){
     return angle/360;
 }
 
@@ -117,7 +129,7 @@ float MotorUnit::getRevolutionsFromAngle(float angle){
  *  @param angle Total angle displacement from 0 in degrees
  *  @return The position displacement from 0 in mm
  */
-float MotorUnit::getDistanceFromAngle(float angle){
+double MotorUnit::getDistanceFromAngle(double angle){
     return getRevolutionsFromAngle(angle) * _mmPerRevolution;
 }
 
@@ -125,7 +137,7 @@ float MotorUnit::getDistanceFromAngle(float angle){
  *  @brief  Set the pulley pitch
  *  @param newPitch Desired linear travel per encoder revolution in mm
  */
-void MotorUnit::setPitch(float newPitch){
+void MotorUnit::setPitch(double newPitch){
     _mmPerRevolution = newPitch;
 }
 
@@ -133,7 +145,7 @@ void MotorUnit::setPitch(float newPitch){
  *  @brief  Retrive the pulley pitch
  *  @return The linear travel per encoder revolution in mm
  */
-float MotorUnit::getPitch(){
+double MotorUnit::getPitch(){
     return _mmPerRevolution;
 }
 
@@ -143,7 +155,7 @@ float MotorUnit::getPitch(){
  *  @param  kI The desired integral tune
  *  @param  kD The desired derivative tune
  */
-void MotorUnit::setPIDTune(float kP, float kI, float kD){
+void MotorUnit::setPIDTune(double kP, double kI, double kD){
     if(controlMode == CURRENT){
         ampProportional = kP;
         ampIntegral = kI;
@@ -193,7 +205,7 @@ void MotorUnit::updatePIDTune(){
  *  @brief  Retrive the proportional portion of the pid tune
  *  @return activeI
  */
-float MotorUnit::getP(){
+double MotorUnit::getP(){
     return activeP;
 }
 
@@ -201,7 +213,7 @@ float MotorUnit::getP(){
  *  @brief  Retrive the integral portion of the pid tune
  *  @return activeI
  */
-float MotorUnit::getI(){
+double MotorUnit::getI(){
     return activeI;
 }
 
@@ -209,7 +221,7 @@ float MotorUnit::getI(){
  *  @brief  Retrive the derivative portion of the pid tune
  *  @return activeD
  */
-float MotorUnit::getD(){
+double MotorUnit::getD(){
     return activeD;
 }
 
@@ -218,18 +230,20 @@ float MotorUnit::getD(){
  *  command the motor to that output
  */
 void MotorUnit::computePID(){
-    lastInterval = (millis() - lastUpdate)/1000.0;
-    lastUpdate = millis();
-    currentState = getControllerState();
     errorDist = setpoint - currentState;
     output = int(pid->getOutput(currentState,setpoint));
-    inRegulation = fabs(errorDist) < accuracy;
+    inRegulation = (fabs(errorDist) < accuracy);// & (mmPerSecond < 0.1);
 
-    if(~disabled){
+    if(!disabled){
         motor->runAtPID(output);
     }else{
         motor->stop();
+        Serial.println("Motor disabled");
     }
+}
+
+void MotorUnit::updateControllerState(){
+    currentState = getControllerState();
 }
 
 /*!
@@ -238,7 +252,10 @@ void MotorUnit::computePID(){
  *  @return Actual state of the motor. This could be position in revolutions or mm, current
  *  in mA, or speed in mm/s.
  */
-float MotorUnit::getControllerState(){
+double MotorUnit::getControllerState(){
+    lastInterval = (millis() - lastUpdate)/1000.0;
+    if(lastInterval < 0.05){return mmPosition;}
+    lastUpdate = millis();
     if(controlMode == CURRENT){
         mampsCurrent = motor->readCurrent();
         return mampsCurrent;
@@ -248,6 +265,8 @@ float MotorUnit::getControllerState(){
         angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
         if(controlMode == DISTANCE){
             mmPosition = getDistanceFromAngle(angleTotal);
+            double tempSpeed = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
+            mmPerSecond = (mmPerSecond+tempSpeed)/2;
             return mmPosition;
         }else if(controlMode == SPEED){
             mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
