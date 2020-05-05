@@ -96,10 +96,10 @@
 #define DC_BOTTOM_RIGHT_MAX_RATE 100.0 // mm/min
 #define DC_Z_AXIS_MAX_RATE 100.0 // mm/min
 
-#define DC_TOP_LEFT_MM_PER_REV 29.92//31.415 // Correct for 10mm pulley
+#define DC_TOP_LEFT_MM_PER_REV -29.92//31.415 // Correct for 10mm pulley
 #define DC_TOP_RIGHT_MM_PER_REV 29.92//31.415
 #define DC_BOTTOM_LEFT_MM_PER_REV 29.92//31.415
-#define DC_BOTTOM_RIGHT_MM_PER_REV 29.92//31.415
+#define DC_BOTTOM_RIGHT_MM_PER_REV -29.92//31.415
 #define DC_Z_AXIS_MM_PER_REV 29.92//31.415 //
 
 // Override defaults
