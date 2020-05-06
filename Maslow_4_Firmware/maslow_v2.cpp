@@ -19,6 +19,9 @@ MotorUnit motor5(&tlc, MOTOR_5_FORWARD, MOTOR_5_BACKWARD, MOTOR_5_ADC, RSENSE, a
 static float x_max = 285.75;
 static float y_max = 336.55;
 
+enum homingStates {TOP_LEFT_HOMING, TOP_RIGHT_HOMING, BOTTOM_LEFT_HOMING, BOTTOM_RIGHT_HOMING, Z_HOMING, DONE};
+homingStates homingState = TOP_LEFT_HOMING;
+
 
 void machine_init(){
     tlc.begin();
@@ -69,7 +72,23 @@ void machine_init(){
 bool user_defined_homing()
 {
   // True = done with homing, false = continue with normal Grbl_ESP32 homing
+switch(homingState){
+case TOP_LEFT_HOMING:
+  motor1.motor->fullBackward();
+  motor2.motor->fullBackward();
+  motor3.motor->fullBackward();
+  motor4.motor->fullBackward();
+  motor5.motor->fullBackward();
+  return false;
+case TOP_RIGHT_HOMING:
+case BOTTOM_LEFT_HOMING:
+case BOTTOM_RIGHT_HOMING:
+case Z_HOMING:
+case DONE:
+  Serial.println("Finished homing");
   return true;
+}
+
 }
 
 /*

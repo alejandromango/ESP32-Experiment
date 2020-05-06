@@ -21,6 +21,10 @@ unsigned long ourTime = millis();
 
 Ticker motorTimer = Ticker();
 
+enum states {HOMING, CONTROLLING};
+states feedbackState = HOMING;
+bool doneHoming = false;
+
 void setup(){
   machine_init();
 
@@ -113,9 +117,12 @@ void setup(){
 
   server.begin();
 
-#ifndef BOARD_BRINGUP
-  motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
-#endif
+// #ifndef BOARD_BRINGUP
+//   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
+// #endif
+
+
+  setpointFlag = true;
   Serial.println("Setup complete");
 
 }
@@ -126,6 +133,19 @@ void onTimer(){
 
 void loop(){
 #ifndef BOARD_BRINGUP
+
+switch(feedbackState){
+case HOMING:
+  doneHoming = user_defined_homing();
+  if(doneHoming){
+    motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
+    feedbackState = CONTROLLING;
+  }
+  delayMicroseconds(5000);
+  pid_get_state();
+
+  break;
+case CONTROLLING:
   delay(1);
   if(setpointFlag){
     update_setpoints(setPoint1, setPoint2, setPoint3, setPoint4, setPoint5);
@@ -142,6 +162,8 @@ void loop(){
     // derivative = motor1.getD();
     modeFlag = false;
   }
+  break;
+}
 #else
   Serial.println("Pins high:");
   motor1.motor->highZ();
