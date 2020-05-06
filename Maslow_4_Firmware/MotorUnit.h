@@ -71,8 +71,8 @@ private:
     double mmDerivative = 0;// 200000;
 
     // PID tunings for speed control
-    double vProportional = 0;
-    double vIntegral = 0;
+    double vProportional = 1000;
+    double vIntegral = 100;
     double vDerivative = 0;
 
     // PID tunings for current control
@@ -104,7 +104,7 @@ private:
     double anglePrevious = 0.0;
 
     double mampsCurrent  = 0.0;
-    pid_mode controlMode = DISTANCE;
+    pid_mode controlMode = CURRENT;
 
 };
 

@@ -44,7 +44,7 @@
 #define TLC_DATA   5
 #define TLC_CLOCK  21
 
-#define RSENSE 10000
+#define RSENSE 1500
 #define MOTOR_1_ADC ADC1_GPIO33_CHANNEL
 #define MOTOR_1_FORWARD 1
 #define MOTOR_1_BACKWARD 0

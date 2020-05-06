@@ -31,6 +31,8 @@ DRV8873LED::DRV8873LED(TLC59711 *tlc,
     _rsense = senseResistor;
     _cal_values = cal;
 
+    double min_voltage = esp_adc_cal_raw_to_voltage(0, _cal_values);
+
 }
 
 /*!
@@ -130,5 +132,5 @@ double DRV8873LED::readCurrent(){
     }
     adcReadback = adcReadback/multisamples;
     double cal_mV = esp_adc_cal_raw_to_voltage(adcReadback, _cal_values);
-    return (cal_mV/_rsense)*1100.0;
+    return ((cal_mV-min_voltage)/_rsense)*1100.0;
 }

@@ -46,6 +46,7 @@ private:
     adc1_channel_t _readback;
     double _rsense;
     esp_adc_cal_characteristics_t *_cal_values;
+    double min_voltage;
 };
 
 #endif
