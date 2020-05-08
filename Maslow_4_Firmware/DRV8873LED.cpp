@@ -130,5 +130,6 @@ double DRV8873LED::readCurrent(){
     }
     adcReadback = adcReadback/multisamples;
     double cal_mV = esp_adc_cal_raw_to_voltage(adcReadback, _cal_values);
-    return (cal_mV/_rsense)*1100.0;
+    double zero_mV = esp_adc_cal_raw_to_voltage(0, _cal_values);
+    return ((cal_mV-zero_mV)/_rsense)*1100.0;
 }
