@@ -12,6 +12,7 @@
 #include "esp_adc_cal.h"
 
 // #define BOARD_BRINGUP
+#define DISABLE_WEBSERVER
 
 const char* ssid = "Leek Soup";
 const char* password = "Cranberry Pie";
@@ -42,7 +43,7 @@ Ticker motorTimer = Ticker();
 
 void setup(){
   Serial.begin(115200);
-
+#ifndef DISABLE_WEBSERVER
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -129,7 +130,7 @@ void setup(){
   });
 
   server.begin();
-
+#endif
   tlc.begin();
   tlc.write();
 #ifndef BOARD_BRINGUP
@@ -149,7 +150,13 @@ void onTimer(){
 
 void loop(){
 #ifndef BOARD_BRINGUP
-  delay(1);
+  delay(2000);
+  Serial.printf("Current is: %g, %g, %g, %g, %g\n",
+                  motor1.getCurrent(),
+                  motor2.getCurrent(),
+                  motor3.getCurrent(),
+                  motor4.getCurrent(),
+                  motor5.getCurrent());
   if(setpointFlag){
     motor1.setSetpoint(setPoint1);
     motor2.setSetpoint(setPoint2);

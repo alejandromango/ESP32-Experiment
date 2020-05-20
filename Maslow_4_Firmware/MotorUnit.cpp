@@ -54,6 +54,14 @@ float MotorUnit::getSetpoint(){
 }
 
 /*!
+ *  @brief  Retrive the current driving the motors
+ *  @return Current in mA
+ */
+float MotorUnit::getCurrent(){
+    return mampsCurrent;
+}
+
+/*!
  *  @brief  Retrive the current error of the PID loop
  *  @return Error in the appropriate units for the control mode
  */
@@ -230,21 +238,21 @@ void MotorUnit::computePID(){
  *  in mA, or speed in mm/s.
  */
 float MotorUnit::getControllerState(){
+    previousAngleTotal = angleTotal;
+    angleCurrent = angleSensor->RotationRawToAngle(angleSensor->getRawRotation());
+    angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
+    mmPosition = getDistanceFromAngle(angleTotal);
+    mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
+    revolutionPosition = getRevolutionsFromAngle(angleTotal);
+    mampsCurrent = motor->readCurrent();
     if(controlMode == CURRENT){
-        mampsCurrent = motor->readCurrent();
         return mampsCurrent;
     }else{
-        previousAngleTotal = angleTotal;
-        angleCurrent = angleSensor->RotationRawToAngle(angleSensor->getRawRotation());
-        angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
         if(controlMode == DISTANCE){
-            mmPosition = getDistanceFromAngle(angleTotal);
             return mmPosition;
         }else if(controlMode == SPEED){
-            mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
             return mmPerSecond;
         }else{
-            revolutionPosition = getRevolutionsFromAngle(angleTotal);
             return revolutionPosition;
         }
     }
