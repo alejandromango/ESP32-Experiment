@@ -133,9 +133,9 @@ void setup(){
 #endif
   tlc.begin();
   tlc.write();
-#ifndef BOARD_BRINGUP
-  motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
-#endif
+// #ifndef BOARD_BRINGUP
+//   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
+// #endif
   Serial.println("Setup complete");
 
 }
@@ -148,15 +148,22 @@ void onTimer(){
   motor5.computePID();
 }
 
+int currentCounter = 0;
+
 void loop(){
 #ifndef BOARD_BRINGUP
-  delay(2000);
-  Serial.printf("Current is: %g, %g, %g, %g, %g\n",
-                  motor1.getCurrent(),
-                  motor2.getCurrent(),
-                  motor3.getCurrent(),
-                  motor4.getCurrent(),
-                  motor5.getCurrent());
+  delay(5);
+  onTimer();
+  currentCounter++;
+  if (currentCounter >= 400){
+    Serial.printf("Current is: %g, Error is: %g, Setpoint is: %g, Position is: %g, %g\n",
+                    motor1.getCurrent(),
+                    motor1.getError(),
+                    motor1.getSetpoint(),
+                    motor1.getInput(),
+                    motor5.getCurrent());
+    currentCounter = 0;
+  }
   if(setpointFlag){
     motor1.setSetpoint(setPoint1);
     motor2.setSetpoint(setPoint2);

@@ -222,6 +222,16 @@ void MotorUnit::computePID(){
     lastUpdate = millis();
     currentState = getControllerState();
     errorDist = setpoint - currentState;
+    if (fabs(errorDist) < 0.2){
+        if (mampsCurrent < 20){
+            setpoint -= 0.1;
+            Serial.printf("Reducing Setpoint, Current: %g\n", mampsCurrent);
+        } else if (mampsCurrent > 30){
+            setpoint += 0.1;
+            Serial.printf("Increasing Setpoint, Current: %g\n", mampsCurrent);
+        }
+    }
+    errorDist = setpoint - currentState;
     output = copysign(int(pid->getOutput(currentState,setpoint)), errorDist);
 
     if(~disabled){
