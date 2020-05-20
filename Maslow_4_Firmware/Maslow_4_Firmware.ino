@@ -32,11 +32,11 @@ esp_err_t config_err_5 = adc1_config_channel_atten(ADC1_GPIO35_CHANNEL, ADC_ATTE
 #define tlcData   5
 #define tlcClock  21
 TLC59711 tlc = TLC59711(NUM_TLC59711, tlcClock, tlcData);
-MotorUnit motor1 = MotorUnit(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics, 17);
-MotorUnit motor2 = MotorUnit(&tlc, 3, 2, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics, 3);
-MotorUnit motor3 = MotorUnit(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics, 22);
-MotorUnit motor4 = MotorUnit(&tlc, 7, 6, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics, 25);
-MotorUnit motor5 = MotorUnit(&tlc, 9, 8, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics, 13);
+MotorUnit motor1 = MotorUnit(&tlc, 1, 0, ADC1_GPIO33_CHANNEL, 10000.0, adc_1_characterisitics, 17, 29);
+MotorUnit motor2 = MotorUnit(&tlc, 3, 2, ADC1_GPIO34_CHANNEL, 10000.0, adc_1_characterisitics, 3, 29);
+MotorUnit motor3 = MotorUnit(&tlc, 5, 4, ADC1_GPIO36_CHANNEL, 10000.0, adc_1_characterisitics, 22, -29);
+MotorUnit motor4 = MotorUnit(&tlc, 7, 6, ADC1_GPIO35_CHANNEL, 10000.0, adc_1_characterisitics, 25, 29);
+MotorUnit motor5 = MotorUnit(&tlc, 9, 8, ADC1_GPIO32_CHANNEL, 10000.0, adc_1_characterisitics, 13, -29);
 
 Ticker motorTimer = Ticker();
 
