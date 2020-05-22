@@ -253,9 +253,9 @@ void MotorUnit::updateControllerState(){
  *  in mA, or speed in mm/s.
  */
 double MotorUnit::getControllerState(){
-    lastInterval = (millis() - lastUpdate)/1000.0;
-    if(lastInterval < 0.05){return mmPosition;}
-    lastUpdate = millis();
+    // lastInterval = (millis() - lastUpdate)/1000.0;
+    // if(lastInterval < 0.05){return mmPosition;}
+    // lastUpdate = millis();
     if(controlMode == CURRENT){
         mampsCurrent = motor->readCurrent();
         return mampsCurrent;
@@ -267,6 +267,7 @@ double MotorUnit::getControllerState(){
             mmPosition = getDistanceFromAngle(angleTotal);
             double tempSpeed = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
             mmPerSecond = (mmPerSecond+tempSpeed)/2;
+            // Serial.printf("Returning mmposition %g, angle: %g, mm_rev: %g\n", mmPosition, angleTotal, _mmPerRevolution);
             return mmPosition;
         }else if(controlMode == SPEED){
             mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;

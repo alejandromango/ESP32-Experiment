@@ -104,7 +104,7 @@ private:
     double anglePrevious = 0.0;
 
     double mampsCurrent  = 0.0;
-    pid_mode controlMode = CURRENT;
+    pid_mode controlMode = DISTANCE;
 
 };
 

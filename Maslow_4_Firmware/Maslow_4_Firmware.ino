@@ -30,32 +30,32 @@ void setup(){
 
   Serial.begin(115200);
 
-  WiFi.begin(ssid, password);
+  // WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   delay(1000);
+  //   Serial.println("Connecting to WiFi..");
+  // }
 
-  Serial.println(WiFi.localIP());
+  // Serial.println(WiFi.localIP());
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", HTML);
-  });
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send(200, "text/html", HTML);
+  // });
 
-  server.on("/settarget", HTTP_POST, [](AsyncWebServerRequest *request){
+  // server.on("/settarget", HTTP_POST, [](AsyncWebServerRequest *request){
 
-    int paramsNr = request->params();
-    Serial.println(paramsNr);
+  //   int paramsNr = request->params();
+  //   Serial.println(paramsNr);
 
-    for(int i=0;i<paramsNr;i++){
+  //   for(int i=0;i<paramsNr;i++){
 
-        AsyncWebParameter* p = request->getParam(i);
-        parseCommand(p->name(), p->value());
-    }
+  //       AsyncWebParameter* p = request->getParam(i);
+  //       parseCommand(p->name(), p->value());
+  //   }
 
-    request->redirect("/");
-  });
+  //   request->redirect("/");
+  // });
 
   // server.on("/position1", HTTP_GET, [](AsyncWebServerRequest *request){
   //   request->send_P(200, "text/plain", String(motor1.getInput(), 5).c_str());
@@ -105,17 +105,17 @@ void setup(){
   //   request->send_P(200, "text/plain", String(motor5.getError(), 5).c_str());
   // });
 
-  server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(proportional, 5).c_str());
-  });
-  server.on("/integral", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(integral, 5).c_str());
-  });
-  server.on("/derivative", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(derivative, 5).c_str());
-  });
+  // server.on("/proportional", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(proportional, 5).c_str());
+  // });
+  // server.on("/integral", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(integral, 5).c_str());
+  // });
+  // server.on("/derivative", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/plain", String(derivative, 5).c_str());
+  // });
 
-  server.begin();
+  // server.begin();
 
 // #ifndef BOARD_BRINGUP
 //   motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
@@ -138,11 +138,10 @@ switch(feedbackState){
 case HOMING:
   doneHoming = user_defined_homing();
   if(doneHoming){
-    motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
+    // motorTimer.attach_ms(100, onTimer); //Gets error when faster than ~100ms cycle
     feedbackState = CONTROLLING;
   }
-  delayMicroseconds(5000);
-  pid_get_state();
+  delay(100);
 
   break;
 case CONTROLLING:
@@ -157,9 +156,6 @@ case CONTROLLING:
   }
   if(modeFlag){
     update_control_mode(updatedMode);
-    // proportional = motor1.getP();
-    // integral = motor1.getI();
-    // derivative = motor1.getD();
     modeFlag = false;
   }
   break;

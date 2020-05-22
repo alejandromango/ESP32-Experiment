@@ -72,15 +72,140 @@ void machine_init(){
 bool user_defined_homing()
 {
   // True = done with homing, false = continue with normal Grbl_ESP32 homing
+  static bool direction = true; // False is backwards, true is forwards
+  static double currentPos = motor1.getControllerState();
+  static double lastPos = currentPos;
+  static int swapCounter = 0;
+  static int shakinIt = 0;
+  static double minPos = MAXFLOAT;
 switch(homingState){
 case TOP_LEFT_HOMING:
-  motor1.motor->fullBackward();
-  motor2.motor->fullBackward();
-  motor3.motor->fullBackward();
+  // Serial.println("Motor POsitions 1-5");
+  currentPos = motor1.getControllerState();
+  motor2.getControllerState();
+  motor3.getControllerState();
+  motor4.getControllerState();
+  motor5.getControllerState();
+  // Serial.printf("Motorstate, Current: %g, Last: %g\n",
+  //                 currentPos,
+  //                 lastPos);
+  // Serial.printf("Current state: %g\n", currentPos);
+  if (currentPos < minPos){
+    minPos = currentPos;
+    shakinIt = 0;
+  }
+  if (shakinIt > 10 & fabs(currentPos-minPos) < 0.1){
+    Serial.printf("Found max = %g\n", minPos);
+    motor1.motor->stop();
+    homingState = TOP_RIGHT_HOMING;
+    direction = true; // False is backwards, true is forwards
+    currentPos = motor1.getControllerState();
+    lastPos = currentPos;
+    swapCounter = 0;
+    shakinIt = 0;
+    minPos = MAXFLOAT;
+    return false;
+  }
+  if (direction){
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = false;
+          Serial.printf("Switching to backward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  } else {
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = true;
+          Serial.printf("Switching to forward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  }
+
   motor4.motor->fullBackward();
-  motor5.motor->fullBackward();
+  if (direction){
+    motor1.motor->forward(40000);
+  } else {
+    motor1.motor->backward(40000);
+  }
+  lastPos = currentPos;
   return false;
 case TOP_RIGHT_HOMING:
+  // Serial.println("Motor POsitions 1-5");
+  motor1.getControllerState();
+  motor2.getControllerState();
+  motor3.getControllerState();
+  currentPos = motor4.getControllerState();
+  motor5.getControllerState();
+  // Serial.printf("Motorstate, Current: %g, Last: %g\n",
+  //                 currentPos,
+  //                 lastPos);
+  // Serial.printf("Current state: %g\n", currentPos);
+  if (currentPos < minPos){
+    minPos = currentPos;
+    shakinIt = 0;
+  }
+  if (shakinIt > 10 & fabs(currentPos-minPos) < 0.1){
+    Serial.printf("Found max = %g\n", minPos);
+    motor4.motor->stop();
+    return true;
+  }
+  if (direction){
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = false;
+          Serial.printf("Switching to backward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  } else {
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = true;
+          Serial.printf("Switching to forward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  }
+
+  motor1.motor->fullBackward();
+  if (direction){
+    motor4.motor->forward(40000);
+  } else {
+    motor4.motor->backward(40000);
+  }
+  lastPos = currentPos;
+  return false;
 case BOTTOM_LEFT_HOMING:
 case BOTTOM_RIGHT_HOMING:
 case Z_HOMING:
