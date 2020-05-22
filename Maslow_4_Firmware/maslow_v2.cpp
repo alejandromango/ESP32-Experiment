@@ -20,7 +20,7 @@ static float x_max = 285.75;
 static float y_max = 336.55;
 
 enum homingStates {TOP_LEFT_HOMING, TOP_RIGHT_HOMING, BOTTOM_LEFT_HOMING, BOTTOM_RIGHT_HOMING, Z_HOMING, DONE};
-homingStates homingState = TOP_LEFT_HOMING;
+homingStates homingState = BOTTOM_LEFT_HOMING;
 
 
 void machine_init(){
@@ -78,76 +78,12 @@ bool user_defined_homing()
   static int swapCounter = 0;
   static int shakinIt = 0;
   static double minPos = MAXFLOAT;
+  unsigned long reading_time;
 switch(homingState){
 case TOP_LEFT_HOMING:
-  // Serial.println("Motor POsitions 1-5");
-  currentPos = motor1.getControllerState();
-  motor2.getControllerState();
-  motor3.getControllerState();
-  motor4.getControllerState();
-  motor5.getControllerState();
-  // Serial.printf("Motorstate, Current: %g, Last: %g\n",
-  //                 currentPos,
-  //                 lastPos);
-  // Serial.printf("Current state: %g\n", currentPos);
-  if (currentPos < minPos){
-    minPos = currentPos;
-    shakinIt = 0;
-  }
-  if (shakinIt > 10 & fabs(currentPos-minPos) < 0.1){
-    Serial.printf("Found max = %g\n", minPos);
-    motor1.motor->stop();
-    homingState = TOP_RIGHT_HOMING;
-    direction = true; // False is backwards, true is forwards
-    currentPos = motor1.getControllerState();
-    lastPos = currentPos;
-    swapCounter = 0;
-    shakinIt = 0;
-    minPos = MAXFLOAT;
-    return false;
-  }
-  if (direction){
-      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
-        swapCounter++;
-        if (swapCounter > 5){
-          shakinIt++;
-          direction = false;
-          Serial.printf("Switching to backward, Current: %g, Last: %g, Min: %g\n",
-                          currentPos,
-                          lastPos,
-                          minPos);
-          swapCounter = 0;
-        }
-      } else {
-        swapCounter = 0;
-      }
-  } else {
-      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
-        swapCounter++;
-        if (swapCounter > 5){
-          shakinIt++;
-          direction = true;
-          Serial.printf("Switching to forward, Current: %g, Last: %g, Min: %g\n",
-                          currentPos,
-                          lastPos,
-                          minPos);
-          swapCounter = 0;
-        }
-      } else {
-        swapCounter = 0;
-      }
-  }
-
-  motor4.motor->fullBackward();
-  if (direction){
-    motor1.motor->forward(40000);
-  } else {
-    motor1.motor->backward(40000);
-  }
-  lastPos = currentPos;
-  return false;
+  break;
 case TOP_RIGHT_HOMING:
-  // Serial.println("Motor POsitions 1-5");
+  Serial.println("Motor POsitions 1-5");
   motor1.getControllerState();
   motor2.getControllerState();
   motor3.getControllerState();
@@ -207,8 +143,87 @@ case TOP_RIGHT_HOMING:
   lastPos = currentPos;
   return false;
 case BOTTOM_LEFT_HOMING:
+  // Serial.println("Motor POsitions 1-5");
+  // Serial.printf("Measuring");
+  // reading_time = micros();
+  currentPos = motor1.getControllerState();
+  motor2.getControllerState();
+  motor3.getControllerState();
+  motor4.getControllerState();
+  motor5.getControllerState();
+  // reading_time = micros() - reading_time;
+  // Serial.printf("\n  Mode = %d\n", currentPos);
+  // Serial.printf("   in %d microseconds\n", reading_time);
+  Serial.printf("Motorstate, Current: %g, Last: %g\n",
+                  currentPos,
+                  lastPos);
+  // Serial.printf("Current state: %g\n", currentPos);
+  if (currentPos < minPos){
+    minPos = currentPos;
+    shakinIt = 0;
+  }
+  if (shakinIt > 10 & fabs(currentPos-minPos) < 0.1){
+    Serial.printf("Found max = %g\n", minPos);
+    motor1.motor->stop();
+    homingState = TOP_RIGHT_HOMING;
+    direction = true; // False is backwards, true is forwards
+    currentPos = motor1.getControllerState();
+    lastPos = currentPos;
+    swapCounter = 0;
+    shakinIt = 0;
+    minPos = MAXFLOAT;
+    return false;
+  }
+  if (direction){
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = false;
+          Serial.printf("Switching to backward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  } else {
+      if ((round(lastPos * 10) / 10) <= (round(currentPos * 10) / 10)){
+        swapCounter++;
+        if (swapCounter > 5){
+          shakinIt++;
+          direction = true;
+          Serial.printf("Switching to forward, Current: %g, Last: %g, Min: %g\n",
+                          currentPos,
+                          lastPos,
+                          minPos);
+          swapCounter = 0;
+        }
+      } else {
+        swapCounter = 0;
+      }
+  }
+
+  motor4.motor->fullBackward();
+  if (direction){
+    motor1.motor->forward(40000);
+  } else {
+    motor1.motor->backward(40000);
+  }
+  lastPos = currentPos;
+  return false;
 case BOTTOM_RIGHT_HOMING:
 case Z_HOMING:
+  Serial.println("Motors Forward:");
+  motor1.motor->fullForward();
+  motor2.motor->fullForward();
+  motor3.motor->fullForward();
+  motor4.motor->fullForward();
+  motor5.motor->fullForward();
+  delay(5000);
+  return false;
 case DONE:
   Serial.println("Finished homing");
   return true;

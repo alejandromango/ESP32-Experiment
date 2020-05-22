@@ -47,7 +47,7 @@ void AS5048A::init(){
   * • Fast mode: clock frequency from 0 to 400 kHz (slave mode)
   * • High speed: 0 to 3.4 MHz clock frequency (slave mode)
   */
-  settings = SPISettings(1000000, MSBFIRST, SPI_MODE1);
+  settings = SPISettings(10000000, MSBFIRST, SPI_MODE1); //
  // initialization of the Slave Select pin if the LOW slave interacts with the master if the HIGH slave ignores the signals from the master
   pinMode(_cs, OUTPUT);
   //SPI has an internal SPI-device counter, it is possible to call "begin()" from different devices
@@ -415,7 +415,7 @@ word AS5048A::read(word RegisterAddress, bool MeanValueMedian){
   digitalWrite(_cs, LOW);
   SPI.transfer16(command);
   digitalWrite(_cs, HIGH);
-  SPI.endTransaction();
+  // SPI.endTransaction(); //
 
   #ifdef AS5048A_DEBUG
     Serial.print("Read (0x");
@@ -526,7 +526,7 @@ word AS5048A::write(word RegisterAddress, word WriteData) {
   SPI.endTransaction();
 
   //SPI - end transaction
-  SPI.endTransaction();
+  // SPI.endTransaction();//
 
   //Return the data, stripping the parity and error bits
   return dataToSend & ~0xC000;

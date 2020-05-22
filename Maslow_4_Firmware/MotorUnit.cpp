@@ -256,24 +256,41 @@ double MotorUnit::getControllerState(){
     // lastInterval = (millis() - lastUpdate)/1000.0;
     // if(lastInterval < 0.05){return mmPosition;}
     // lastUpdate = millis();
+    mampsCurrent = motor->readCurrent();
+    previousAngleTotal = angleTotal;
+    mostVal = 0;
+    instances = 0;
+    mostInstances = 0;
+    for(int i = 0; i < 10; i++){
+        angles[i] = angleSensor->getRawRotation();
+        // Serial.printf("\n  Angle %d = %d,", i, angles[i]);
+        for(int j = 0; j <= i; j++){
+            if(angles[i] == angles[j]){
+                instances++;
+                if (instances > mostInstances){
+                    mostInstances = instances;
+                    mostVal = angles[i];
+                }
+            }
+        }
+        instances = 0;
+    }
+    angleCurrent = angleSensor->RotationRawToAngle(mostVal);
+    angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
+    mmPosition = getDistanceFromAngle(angleTotal);
+    double tempSpeed = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
+    mmPerSecond = (mmPerSecond+tempSpeed)/2;
+    revolutionPosition = getRevolutionsFromAngle(angleTotal);
     if(controlMode == CURRENT){
-        mampsCurrent = motor->readCurrent();
         return mampsCurrent;
     }else{
-        previousAngleTotal = angleTotal;
-        angleCurrent = angleSensor->RotationRawToAngle(angleSensor->getRawRotation());
-        angleSensor->AbsoluteAngleRotation(&angleTotal, &angleCurrent, &anglePrevious);
         if(controlMode == DISTANCE){
-            mmPosition = getDistanceFromAngle(angleTotal);
-            double tempSpeed = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
-            mmPerSecond = (mmPerSecond+tempSpeed)/2;
             // Serial.printf("Returning mmposition %g, angle: %g, mm_rev: %g\n", mmPosition, angleTotal, _mmPerRevolution);
             return mmPosition;
         }else if(controlMode == SPEED){
-            mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
+            // mmPerSecond = (getDistanceFromAngle(angleTotal) - getDistanceFromAngle(previousAngleTotal))/lastInterval;
             return mmPerSecond;
         }else{
-            revolutionPosition = getRevolutionsFromAngle(angleTotal);
             return revolutionPosition;
         }
     }

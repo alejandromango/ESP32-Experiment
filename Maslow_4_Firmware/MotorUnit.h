@@ -55,6 +55,10 @@ public:
 private:
     void   _disableControl();
     void   _enableControl();
+    int angles[10];
+    int mostVal = 0;
+    int instances = 0;
+    int mostInstances = 0;
 
     double _mmPerRevolution = 1;
     double lastInterval = 0.001;
