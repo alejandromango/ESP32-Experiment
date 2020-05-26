@@ -26,6 +26,7 @@ homingStates homingState = BOTTOM_LEFT_HOMING;
 void machine_init(){
     tlc.begin();
     tlc.write();
+    delay(10); //Allow Angle sensors to boot
     Serial.println("machine setup complete");
 
 }
@@ -143,20 +144,14 @@ case TOP_RIGHT_HOMING:
   lastPos = currentPos;
   return false;
 case BOTTOM_LEFT_HOMING:
-  // Serial.println("Motor POsitions 1-5");
-  // Serial.printf("Measuring");
-  // reading_time = micros();
   currentPos = motor1.getControllerState();
   motor2.getControllerState();
   motor3.getControllerState();
   motor4.getControllerState();
   motor5.getControllerState();
-  // reading_time = micros() - reading_time;
-  // Serial.printf("\n  Mode = %d\n", currentPos);
-  // Serial.printf("   in %d microseconds\n", reading_time);
-  Serial.printf("Motorstate, Current: %g, Last: %g\n",
-                  currentPos,
-                  lastPos);
+  // Serial.printf("Motorstate, Current: %g, Last: %g\n",
+  //                 currentPos,
+  //                 lastPos);
   // Serial.printf("Current state: %g\n", currentPos);
   if (currentPos < minPos){
     minPos = currentPos;

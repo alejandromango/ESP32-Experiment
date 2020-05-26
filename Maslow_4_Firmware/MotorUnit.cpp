@@ -261,9 +261,8 @@ double MotorUnit::getControllerState(){
     mostVal = 0;
     instances = 0;
     mostInstances = 0;
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < ANGLE_READS; i++){
         angles[i] = angleSensor->getRawRotation();
-        // Serial.printf("\n  Angle %d = %d,", i, angles[i]);
         for(int j = 0; j <= i; j++){
             if(angles[i] == angles[j]){
                 instances++;
